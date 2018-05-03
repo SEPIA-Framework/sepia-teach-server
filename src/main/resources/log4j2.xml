@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p [%t] %C{2} - %m%n"/>
+        </Console>
+        <!-- comment in to log to file:
+        <File name="FILE" fileName="/tmp/teach-api.log" bufferedIO="false" advertise="true">
+        </File>
+        -->
+    </Appenders>
+    <Loggers>
+        <Logger name="org.apache.log4j.xml" level="info"/>
+        <Root level="info">
+            <AppenderRef ref="STDOUT"/>
+            <!--<AppenderRef ref="FILE"/>-->
+        </Root>
+    </Loggers>
+</Configuration>
