@@ -11,6 +11,7 @@ import net.b07z.sepia.server.core.data.Answer;
 import net.b07z.sepia.server.core.data.CmdMap;
 import net.b07z.sepia.server.core.data.Command;
 import net.b07z.sepia.server.core.data.Language;
+import net.b07z.sepia.server.core.database.DatabaseInterface;
 import net.b07z.sepia.server.core.users.Account;
 import net.b07z.sepia.server.teach.data.Vote;
 
@@ -20,52 +21,16 @@ import net.b07z.sepia.server.teach.data.Vote;
  * @author Florian Quirin
  *
  */
-public interface TeachDatabase {
+public interface TeachDatabase extends DatabaseInterface{
 	
 	//---- common db methods ----
 
 	/**
 	 * A database may not be real-time. In those cases, this will force a refresh so that
-	 * recent changes become visible in upcoming searches.
+	 * recent changes become visible in upcoming searches.<br>
+	 * See https://www.elastic.co/guide/en/elasticsearch/guide/current/near-real-time.html
 	 */
 	void refresh();
-	
-	/**
-	 * Set the data/properties/values of an item of "type" at "index". 
-	 * @param index - index or table name like e.g. "account" or "knowledge"
-	 * @param type - subclass name, e.g. "user", "lists", "banking" (for account) or "geodata" and "dictionary" (for knowledge) 
-	 * @param itemId - unique item/id name, e.g. user email address, dictionary word or geodata location name
-	 * @param data - JSON string with data objects that should be stored for index/type/item, e.g. {"name":"john"}
-	 */
-	void setItemData(String index, String type, String itemId, JSONObject data);
-	
-	/**
-	 * Set the data/properties/values of an arbitrary item of "type" at "index". Use this if you don't care about the unique id like
-	 * when you store blog posts. The item id will be generated automatically.
-	 * @param index - index or table name like e.g. "homepage"
-	 * @param type - subclass name, e.g. "blogpost"
-	 * @param data - JSON string with data objects that should be stored for index/type/any_id, e.g. {"title":"Hot News", "body":"bla bla...", "author":"john james"}
-	 */
-	void setAnyItemData(String index, String type, JSONObject data);
-	
-	/**
-	 * Get item at path "index/type/item_id"
-	 * @param index - index or table name like e.g. "account" or "knowledge"
-	 * @param type - subclass name, e.g. "user", "lists", "banking" (for account) or "geodata" and "dictionary" (for knowledge) 
-	 * @param itemId - unique item/id name, e.g. user email address, dictionary word or geodata location name
-	 * @return JSONObject with result or error description
-	 */
-	JSONObject getItem(String index, String type, String itemId);
-	
-	/**
-	 * Get filtered entries of the item at path "index/type/item_id". Use this if you want for example only a user name or something.
-	 * @param index - index or table name like e.g. "account" or "knowledge"
-	 * @param type - subclass name, e.g. "user", "lists", "banking" (for account) or "geodata" and "dictionary" (for knowledge) 
-	 * @param itemId - unique item/id name, e.g. user email address, dictionary word or geodata location name
-	 * @param filters - String array with filters like {"name", "address", "language", "age"}
-	 * @return JSONObject with result or error description
-	 */
-	JSONObject getItemFiltered(String index, String type, String itemId, String[] filters);
 	
 	/**
 	 * Search at "path" for a keyword.
@@ -80,7 +45,7 @@ public interface TeachDatabase {
 	
 	/**
 	 * Search at index, type (path) for a keyword. Same as 'searchSimple' but always start at 0 
-	 * and take max. 100 results.
+	 * and take max. 100 results (and use index + type instead of path).
 	 * @param index - Index to search
 	 * @param type - Type in index to search
 	 * @param query - something to search like "name:John" or simply "John" or "*" for all.
@@ -88,31 +53,7 @@ public interface TeachDatabase {
 	 */
 	JSONObject search(String index, String type, String query);
 	
-	/**
-	 * Post a JSON query to ES - to be used for internal tools where we need full query flexibility.
-	 */
-	JSONObject searchByJson(String path, String queryJson);
-	
-	/**
-	 * Delete a entry by using a JSON query 
-	 */
-	JSONObject deleteByJson(String path, String jsonQuery);
-		
-	/**
-	 * Delete item of "type" at "index".
-	 * @param index - index or table name like e.g. "account"
-	 * @param type - subclass name, e.g. "user"
-	 * @param itemId - item to delete, e.g. a user_id (email)
-	 */
-	void deleteItem(String index, String type, String itemId);
-	
-	/**
-	 * Delete any object like "index" (with all entries), "type" or "item"
-	 * @param path - path of what you want to delete like "account/" or "account/banking/"
-	 */
-	void deleteAnything(String path);
 
-	
 	//-----teach API specific methods-----
 
 	/**

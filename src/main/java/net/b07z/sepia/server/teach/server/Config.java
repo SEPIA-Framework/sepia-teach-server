@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import org.slf4j.LoggerFactory;
 
+import net.b07z.sepia.server.core.data.Answer;
 import net.b07z.sepia.server.core.server.ConfigDefaults;
 import net.b07z.sepia.server.core.tools.FilesAndStreams;
 import net.b07z.sepia.server.teach.database.ConfigElasticSearch;
@@ -56,7 +57,7 @@ public final class Config {
 	public static final String DB_USERDATA = "userdata";		//user data like account, list, contacts, etc.
 	public static final String DB_FEEDBACK = "storage";			//store feedback data. SAME as storage right now
 	public static final String DB_COMMANDS = "commands";		//command teachings submitted by developers
-	public static final String DB_ANSWERS = "answers";			//answers to chats and commands
+	public static final String DB_ANSWERS = Answer.ANSWERS_INDEX;		//answers to chats and commands
 	public static final String DB_LOGS = "logs";				//user actions log (write actions only)
 	//types
 	//... should be inside the corresponding classes e.g. Feedback/Command/... 

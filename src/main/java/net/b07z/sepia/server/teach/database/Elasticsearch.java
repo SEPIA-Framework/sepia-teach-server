@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +26,7 @@ import net.b07z.sepia.server.core.data.Command;
 import net.b07z.sepia.server.core.data.Language;
 import net.b07z.sepia.server.core.tools.Connectors;
 import net.b07z.sepia.server.core.tools.Converters;
+import net.b07z.sepia.server.core.tools.DateTime;
 import net.b07z.sepia.server.core.tools.EsQueryBuilder;
 import net.b07z.sepia.server.core.tools.JSON;
 import net.b07z.sepia.server.core.tools.EsQueryBuilder.QueryElement;
@@ -60,13 +59,22 @@ public class Elasticsearch implements TeachDatabase {
 	//-------INTERFACE IMPLEMENTATIONS---------
 	
 	@Override
-	public void setItemData(String index, String type, String itemId, JSONObject data) {
-		writeDocument(index, type, itemId, data);
+	public void refresh() {
+		String url = esServer + "/_refresh";
+		JSONObject result = Connectors.httpGET(url);
+		failOnRestError(url, result);
 	}
 	
 	@Override
-	public void setAnyItemData(String index, String type, JSONObject data) {
-		writeDocument(index, type, data);
+	public int setItemData(String index, String type, String itemId, JSONObject data) {
+		writeDocument(index, type, itemId, data);
+		return 0; 		//always 0 or error in this implementation of the interface
+	}
+	
+	@Override
+	public JSONObject setAnyItemData(String index, String type, JSONObject data) {
+		String id = writeDocument(index, type, data);
+		return JSON.make("code", 0, "_id", id);		//always 0 or error in this implementation of the interface
 	}
 	
 	@Override
@@ -86,15 +94,66 @@ public class Elasticsearch implements TeachDatabase {
 	}
 	
 	@Override
-	public void deleteItem(String index, String type, String itemId) {
-		deleteDocument(index, type, itemId);
+	public int updateItemData(String index, String type, String item_id, JSONObject data) {
+		throw new RuntimeException("Method not implemented yet");
+		//return 0;
+	}
+
+	@Override
+	public JSONObject searchSimple(String path, String searchTerm) {
+		JSONObject json = searchSimple(path, searchTerm, 0, 100);
+		return (JSONObject) json.get("hits");
 	}
 	
 	@Override
-	public void deleteAnything(String path) {
+	public JSONObject search(String index, String type, String query) {
+		JSONObject json = searchSimple(index + "/" + type, query, 0, 100);
+		return (JSONObject) json.get("hits");
+	}
+	
+	@Override
+	public JSONObject searchSimple(String path, String searchTerm, int from, int size){
+		String pathWithSlash = path.endsWith("/") ? path : path + "/";
+		try {
+			String url = esServer + "/" + pathWithSlash + "_search?q=" + URLEncoder.encode(searchTerm, "UTF-8") + "&from=" + from + "&size=" + size;
+			JSONObject result = Connectors.httpGET(url);
+			failOnRestError(url, result);
+			return result;
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public JSONObject searchByJson(String path, String queryJson) {
+		String pathWithSlash = path.endsWith("/") ? path : path + "/";
+		String url = esServer + "/" + pathWithSlash + "_search";
+		JSONObject result = Connectors.httpPOST(url, queryJson, null);
+		failOnRestError(url, result);
+		return result;
+	}
+	
+	@Override
+	public int deleteItem(String index, String type, String itemId) {
+		deleteDocument(index, type, itemId);
+		return 0; 		//always 0 or error in this implementation of the interface
+	}
+	
+	@Override
+	public int deleteAnything(String path) {
 		String url = esServer + "/" + path;
 		JSONObject result = Connectors.httpDELETE(url);
 		failOnRestError(url, result);
+		return 0; 		//always 0 or error in this implementation of the interface
+	}
+
+	@Override
+	public JSONObject deleteByJson(String path, String jsonQuery) {
+		String pathWithSlash = path.endsWith("/") ? path : path + "/";
+		String url = esServer + "/" + pathWithSlash + "_delete_by_query";
+		JSONObject result = Connectors.httpPOST(url, jsonQuery, null);
+		failOnRestError(url, result);
+		return result;
 	}
 	
 	//--------ELASTICSEARCH METHODS---------
@@ -199,68 +258,6 @@ public class Elasticsearch implements TeachDatabase {
 		return getDocument(index, type, id + "?_source=" + sources.replaceAll("\\s+", "").trim());
 	}
 
-	/**
-	 * Simple search at "path" where "path" can be "index", "index/type" and "index/type/item_id".
-	 * @param path - any combination from "index" to "index/type/item_id"
-	 * @param searchTerm - search filters like "name:john" or e.g. "*" for all
-	 * @return JSONObject with search result or error
-	 */
-	@Override
-	public JSONObject searchSimple(String path, String searchTerm, int from, int size){
-		String pathWithSlash = path.endsWith("/") ? path : path + "/";
-		try {
-			String url = esServer + "/" + pathWithSlash + "_search?q=" + URLEncoder.encode(searchTerm, "UTF-8") + "&from=" + from + "&size=" + size;
-			JSONObject result = Connectors.httpGET(url);
-			failOnRestError(url, result);
-			return result;
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	@Override
-	public JSONObject search(String index, String type, String query) {
-		JSONObject json = searchSimple(index + "/" + type, query, 0, 100);
-		return (JSONObject) json.get("hits");
-	}
-
-	/**
-	 * Post a JSON query to ES.
-	 */
-	@Override
-	public JSONObject searchByJson(String path, String queryJson) {
-		String pathWithSlash = path.endsWith("/") ? path : path + "/";
-		String url = esServer + "/" + pathWithSlash + "_search";
-		JSONObject result = Connectors.httpPOST(url, queryJson, null);
-		failOnRestError(url, result);
-		return result;
-	}
-	/**
-	 * Delete document by JSON query
-	 */
-	@Override
-	public JSONObject deleteByJson(String path, String jsonQuery) {
-		String pathWithSlash = path.endsWith("/") ? path : path + "/";
-		String url = esServer + "/" + pathWithSlash + "_delete_by_query";
-		JSONObject result = Connectors.httpPOST(url, jsonQuery, null);
-		failOnRestError(url, result);
-		return result;
-	}
-
-	/**
-	 * ES isn't real-time, but this method will force a refresh so all clients see the latest changes.
-	 * See https://www.elastic.co/guide/en/elasticsearch/guide/current/near-real-time.html
-	 */
-	@Override
-	public void refresh() {
-		String url = esServer + "/_refresh";
-		JSONObject result = Connectors.httpGET(url);
-		failOnRestError(url, result);
-	}
-	
-	private static String getNow() {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		return sdf.format(new Date());
-	}
 	
 	//------------------------ SPECIFIC METHODS FOR THE API -----------------------------
 	
@@ -504,7 +501,7 @@ public class Elasticsearch implements TeachDatabase {
 				JSONArray votesArray = new JSONArray();
 				JSONObject voteObj = new JSONObject();
 				JSON.add(voteObj, "vote", vote.name());
-				JSON.add(voteObj, "date", getNow());
+				JSON.add(voteObj, "date", DateTime.getLogDate());
 				JSON.add(voteObj, "user", account.getUserID());
 				JSON.add(votesArray, voteObj);
 				JSON.add(sentence, "votes", votesArray);
@@ -594,7 +591,7 @@ public class Elasticsearch implements TeachDatabase {
 			JSONArray votesArray = new JSONArray();
 			JSONObject voteObj = new JSONObject();
 			JSON.add(voteObj, "vote", vote.name());
-			JSON.add(voteObj, "date", getNow());
+			JSON.add(voteObj, "date", DateTime.getLogDate());
 			JSON.add(voteObj, "user", account.getUserID());
 			JSON.add(votesArray, voteObj);
 			JSON.add(sentence, "votes", votesArray);
