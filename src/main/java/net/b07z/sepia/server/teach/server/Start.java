@@ -87,7 +87,7 @@ public final class Start {
 			}else if (arg.equals("--ssl")){
 				//SSL
 				isSSL = true;
-			}else if (arg.startsWith("--keystorePwd=")){
+			}else if (arg.startsWith("keystorePwd=")){
 				//Java key-store password - TODO: maybe not the best way to load the pwd ...
 				keystorePwd = arg.replaceFirst(".*?=", "").trim();
 			}
