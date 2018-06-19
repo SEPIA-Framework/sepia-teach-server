@@ -1,0 +1,40 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>net.b07z.sepia.server.teach</groupId>
+  <artifactId>sepia-teach-API</artifactId>
+  <version>2.0.0</version>
+  <name>SEPIA Teach APIs</name>
+  <description>SEPIA APIs to teach the assistant and manage user and community contributions</description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <!-- call 'mvn assembly:assembly -DdescriptorId=jar-with-dependencies' to get the uberjar: -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>server.Start</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.b07z.sepia.server.core</groupId>
+            <artifactId>sepia-core-tools</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+    </dependencies>
+	
+</project>

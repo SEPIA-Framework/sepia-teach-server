@@ -1,0 +1,35 @@
+{
+  "command": "test",
+  "type": "mytype",
+  "info": "",
+  "sentences": 
+    [
+      {
+        "public": true,
+        "language": "en",
+        "text": "Hello, <user>, how are you?",
+        "tagged_text" : "",
+        "params": {},
+        "cmd_summary": "foo",
+        "machine_translated": false,
+        "user": "myuser",
+        "user_location": "5,8.2",
+        "data": {},
+        "replies": "",
+        "date": "2016-05-31T11:10:43"
+      },
+      {
+        "public": true,
+        "language": "de",
+        "text": "Hallo, <user>, wie geht es Dir?",
+        "translated_from": "Hello, <user>, how are you?",
+        "tagged_text" : "",
+        "params": {},
+        "cmd_summary": "foo",
+        "machine_translated": true,
+        "data": {},
+        "replies": "",
+        "date": "2016-05-31T11:10:43"
+      }
+    ]
+}

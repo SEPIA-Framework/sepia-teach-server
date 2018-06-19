@@ -1,0 +1,15 @@
+{
+  "characters": [
+    "polite",
+    "neutral"
+  ],
+  "mood": 5,
+  "language": "DE",
+  "text": "war das jetzt ein ja oder ein nein <user_name>?",
+  "type": "yes_no_ask_0a",
+  "repetition": 1,
+  "user":"assistant",
+  "machine_translated":true,
+  "translated_from":"was that a yes or a no <user_name>",
+  "source":"import"
+}
