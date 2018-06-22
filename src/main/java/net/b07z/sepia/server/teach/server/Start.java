@@ -115,14 +115,15 @@ public final class Start {
 		coreToolsConfig = JSON.make(
 				"defaultAssistAPI", Config.assistAPI,
 				"defaultTeachAPI", Config.endpointUrl,
-				"clusterKey", Config.clusterKey
+				"clusterKey", Config.clusterKey,
+				"privacyPolicy", Config.privacyPolicyLink
 		);
 		ConfigDefaults.setupCoreTools(coreToolsConfig);
 		//part 2
 		long clusterTic = Timer.tic();
 		JSONObject assistApiClusterData = ConfigDefaults.getAssistantClusterData();
 		if (assistApiClusterData == null){
-			new RuntimeException("Core-tools are NOT set properly! AssistAPI could not be reached!");
+			throw new RuntimeException("Core-tools are NOT set properly! AssistAPI could not be reached!");
 		}else{
 			log.info("Received cluster-data from AssistAPI after " + Timer.toc(clusterTic) + "ms");
 		}
@@ -135,7 +136,7 @@ public final class Start {
 		
 		//Check core-tools settings
 		if (!ConfigDefaults.areCoreToolsSet()){
-			new RuntimeException("Core-tools are NOT set properly!");
+			throw new RuntimeException("Core-tools are NOT set properly!");
 		}
 
 		Debugger.println("Starting Teach-API server " + Config.apiVersion + " (" + serverType + ")", 3);

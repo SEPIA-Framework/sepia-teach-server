@@ -21,6 +21,7 @@ public final class Config {
 	public static String localName = "sepia-teach-server";			//**user defined local server name
 	public static String localSecret = "123456";					//**user defined secret to validate local server
 	public static final String apiVersion = "v2.0.0";				//API version
+	public static String privacyPolicyLink = "";					//Link to privacy policy
 	
 	//helper for dynamic class creation
 	public static final String parentPackage = Config.class.getPackage().getName().substring(0, Config.class.getPackage().getName().lastIndexOf('.'));
@@ -85,6 +86,8 @@ public final class Config {
 			localName = settings.getProperty("server_local_name");
 			localSecret = settings.getProperty("server_local_secret");
 			clusterKey = settings.getProperty("cluster_key");
+			//policies
+			privacyPolicyLink =  settings.getProperty("privacy_policy");
 			//databases
 			defaultRegion = settings.getProperty("db_default_region", "eu");
 			ConfigElasticSearch.endpoint_custom = settings.getProperty("db_elastic_endpoint_custom", "");
