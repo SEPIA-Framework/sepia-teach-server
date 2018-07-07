@@ -7,12 +7,14 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 
 import org.json.simple.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import net.b07z.sepia.server.core.tools.Connectors;
 import net.b07z.sepia.server.core.tools.JSON;
 import net.b07z.sepia.server.teach.database.Elasticsearch;
 
+@Ignore("Test need to be updated and are temporarily deactivated!") 		//TODO: update tests
 public class ElasticsearchTest {
 	
 	public static final String UNIT_TEST_ES = "http://localhost:8080";
