@@ -26,9 +26,8 @@
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>
-								${project.build.directory}/libs
-							</outputDirectory>
+							<outputDirectory>${project.build.directory}/release/libs</outputDirectory>
+							<includeScope>runtime</includeScope>
 						</configuration>
 					</execution>
 				</executions>
@@ -47,8 +46,31 @@
 							</mainClass>
 						</manifest>
 					</archive>
+					<outputDirectory>${project.build.directory}/release</outputDirectory>
 					<finalName>sepia-teach-v${project.version}</finalName>
 				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>copy-resources-1</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/release/Xtensions</outputDirectory>
+							<resources>          
+								<resource>
+									<directory>Xtensions</directory>
+									<!--<filtering>true</filtering>-->
+								</resource>
+							</resources>              
+						</configuration>            
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
@@ -59,6 +81,13 @@
             <artifactId>sepia-core-tools</artifactId>
             <version>2.0.1</version>
         </dependency>
+        
+        <dependency>
+      		<groupId>junit</groupId>
+      		<artifactId>junit</artifactId>
+      		<version>4.12</version>
+      		<scope>test</scope>
+    	</dependency>
     </dependencies>
 	
 </project>
