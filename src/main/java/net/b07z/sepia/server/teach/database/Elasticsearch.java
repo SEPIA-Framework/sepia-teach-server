@@ -388,7 +388,7 @@ public class Elasticsearch implements TeachDatabase {
 	}
 	@Override
 	public JSONArray getAllPersonalCommands(HashMap<String, Object> filters) {
-		long from = Converters.obj2Long(filters.get("from"));		if (from == -1) from = 0;	
+		long from = Converters.obj2LongOrDefault(filters.get("from"), -1l);		if (from == -1) from = 0;	
 		String userId = (String) filters.get("userId");
 		String language = (filters.containsKey("language"))? (String) filters.get("language") : "";
 		
