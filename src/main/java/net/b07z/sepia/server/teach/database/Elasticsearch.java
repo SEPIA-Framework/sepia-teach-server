@@ -391,6 +391,7 @@ public class Elasticsearch implements TeachDatabase {
 		long from = Converters.obj2LongOrDefault(filters.get("from"), -1l);		if (from == -1) from = 0;	
 		String userId = (String) filters.get("userId");
 		String language = (filters.containsKey("language"))? (String) filters.get("language") : "";
+		boolean with_button_only = filters.containsKey("button"); 		//Note: we don't actually check the value, if its there its true!
 		
 		//build a nested query
 		String nestPath = "sentences";
@@ -398,6 +399,9 @@ public class Elasticsearch implements TeachDatabase {
 		nestedMatches.add(new QueryElement(nestPath + ".user", userId));
 		if (!language.isEmpty()){
 			nestedMatches.add(new QueryElement(nestPath + ".language", language));
+		}
+		if (with_button_only){
+			nestedMatches.add(new QueryElement(nestPath + ".data.show_button", true));
 		}
 		JSONObject queryJson = EsQueryBuilder.getNestedBoolMustMatch(nestPath, nestedMatches);
 		JSON.put(queryJson, "from", from);

@@ -38,6 +38,7 @@ import net.b07z.sepia.server.core.tools.Connectors;
 import net.b07z.sepia.server.core.tools.Converters;
 import net.b07z.sepia.server.core.tools.DateTime;
 import net.b07z.sepia.server.core.tools.Debugger;
+import net.b07z.sepia.server.core.tools.Is;
 import net.b07z.sepia.server.core.tools.JSON;
 import net.b07z.sepia.server.core.tools.Timer;
 import net.b07z.sepia.server.core.users.Account;
@@ -574,11 +575,19 @@ public final class Start {
 		if ((cmdSummary == null || cmdSummary.isEmpty()) && (paramsJson != null && !paramsJson.isEmpty())){
 			cmdSummary = Converters.makeCommandSummary(command, paramsJson);
 		}
-		String userLocation = params.getString("user_location");
+		String userLocation = params.getString("user_location");		//TODO: The client should keeps this as detailed or vague as required
 		String[] repliesArr = params.getStringArray("reply");
 		List<String> replies = repliesArr == null ? new ArrayList<>() : Arrays.asList(repliesArr);
+		//custom button data and stuff
+		JSONObject dataJson;		
+		String dataJsonString = params.getString("data");
+		if (Is.notNullOrEmpty(dataJsonString)){
+			dataJson = JSON.parseString(dataJsonString); 		
+		}else{
+			dataJson = new JSONObject(); 		//NOTE: If no data is submitted it will kill all previous data info (anyway the whole object is overwritten)
+		}
 		
-		//build sentence
+		//build sentence - Note: Commands support sentence arrays but we use only one entry
 		List<Command.Sentence> sentenceList = new ArrayList<>();
 		Command.Sentence sentenceObj = new SentenceBuilder(sentence, account.getUserID(), "community") 		//TODO: add user role check to switch from "community" to "developer"?
 				.setLanguage(Language.valueOf(language.name().toUpperCase()))
@@ -590,6 +599,7 @@ public final class Start {
 				.setExplicit(isExplicit)
 				.setEnvironment(environment)
 				.setUserLocation(userLocation)
+				.setData(dataJson)
 				//TODO: keep it or remove it? The general answers should be stored in an index called "answers"
 				//and the connector is the command. For chats, custom answers are inside parameter "reply". But I think its still useful here ...
 				.setReplies(new ArrayList<>(replies))
@@ -679,10 +689,14 @@ public final class Start {
 		}
 		String language = getOrDefault("language", userAccount.getPreferredLanguage(), params);
 		String from = getOrDefault("from", "0", params);
+		String with_button_only = getOrDefault("button", null, params);
 		HashMap<String, Object> filters = new HashMap<>();
 		filters.put("userId", userAccount.getUserID());
 		filters.put("language", language);
 		filters.put("from", from);
+		if (with_button_only != null){
+			filters.put("button", true); 	//Its either true or not included
+		}
 		
 		TeachDatabase db = getDatabase();
 		JSONArray output = db.getAllPersonalCommands(filters);
