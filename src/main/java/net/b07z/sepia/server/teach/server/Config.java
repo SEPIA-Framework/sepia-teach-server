@@ -18,7 +18,7 @@ import net.b07z.sepia.server.teach.database.Elasticsearch;
  */
 public final class Config {
 	public static final String SERVERNAME = "SEPIA-Teach-API"; 		//public server name
-	public static String localName = "sepia-teach-server";			//**user defined local server name
+	public static String localName = "sepia-teach-server-1";		//**user defined local server name
 	public static String localSecret = "123456";					//**user defined secret to validate local server
 	public static final String apiVersion = "v2.0.2";				//API version
 	public static String privacyPolicyLink = "";					//Link to privacy policy
@@ -40,7 +40,7 @@ public final class Config {
 	//Region settings
 	public static final String REGION_US = "us";					//Region tag for US
 	public static final String REGION_EU = "eu";					//Region tag for EU
-	public static final String REGION_TEST = "us";					//Region tag for TEST
+	public static final String REGION_TEST = "custom";				//Region tag for TEST
 	public static final String REGION_CUSTOM = "custom";			//Region tag for CUSTOM server
 	public static String defaultRegion = REGION_EU;				//**Region for different cloud services (e.g. AWS)
 
@@ -89,8 +89,8 @@ public final class Config {
 			//policies
 			privacyPolicyLink =  settings.getProperty("privacy_policy");
 			//databases
-			defaultRegion = settings.getProperty("db_default_region", "eu");
-			ConfigElasticSearch.endpoint_custom = settings.getProperty("db_elastic_endpoint_custom", "");
+			defaultRegion = settings.getProperty("db_default_region", "custom");
+			ConfigElasticSearch.endpoint_custom = settings.getProperty("db_elastic_endpoint_custom", "http://localhost:20724");
 			ConfigElasticSearch.endpoint_eu1 = settings.getProperty("db_elastic_endpoint_eu1");
 			ConfigElasticSearch.endpoint_us1 = settings.getProperty("db_elastic_endpoint_us1");
 			//more settings
