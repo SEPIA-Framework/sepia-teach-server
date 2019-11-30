@@ -27,4 +27,14 @@ public class ConfigElasticSearch {
 			return endpoint_custom;
 		}
 	}
+
+	//Auth. type and data
+	public static String auth_type = null;
+	public static String auth_data = null;
+	public static String getAuthType(){
+		return auth_type;
+	}
+	public static String getAuthData(){
+		return auth_data;
+	}
 }

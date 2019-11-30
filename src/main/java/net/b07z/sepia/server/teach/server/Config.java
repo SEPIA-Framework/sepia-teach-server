@@ -93,6 +93,8 @@ public final class Config {
 			ConfigElasticSearch.endpoint_custom = settings.getProperty("db_elastic_endpoint_custom", "http://localhost:20724");
 			ConfigElasticSearch.endpoint_eu1 = settings.getProperty("db_elastic_endpoint_eu1");
 			ConfigElasticSearch.endpoint_us1 = settings.getProperty("db_elastic_endpoint_us1");
+			ConfigElasticSearch.auth_type = settings.getProperty("db_elastic_auth_type", null);
+			ConfigElasticSearch.auth_data = settings.getProperty("db_elastic_auth_data", null);
 			//more settings
 			allowInternalCalls = Boolean.valueOf(settings.getProperty("allow_internal_calls"));
 			useDatabaseLog = Boolean.valueOf(settings.getProperty("use_db_log"));

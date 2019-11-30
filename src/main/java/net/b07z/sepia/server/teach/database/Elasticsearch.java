@@ -30,6 +30,7 @@ import net.b07z.sepia.server.core.tools.DateTime;
 import net.b07z.sepia.server.core.tools.EsQueryBuilder;
 import net.b07z.sepia.server.core.tools.JSON;
 import net.b07z.sepia.server.core.tools.EsQueryBuilder.QueryElement;
+import net.b07z.sepia.server.core.tools.Is;
 import net.b07z.sepia.server.core.users.Account;
 import net.b07z.sepia.server.teach.data.Vote;
 import net.b07z.sepia.server.teach.server.Config;
@@ -47,13 +48,52 @@ public class Elasticsearch implements TeachDatabase {
 
 	private final JsonFactory factory = new JsonFactory();
 	private final String esServer;
+	private String esAuthType;
+	private String esAuthData;
 
 	public Elasticsearch() {
-		esServer = ConfigElasticSearch.getEndpoint(Config.defaultRegion);
+		this.esServer = ConfigElasticSearch.getEndpoint(Config.defaultRegion);
+		this.esAuthType = ConfigElasticSearch.getAuthType();
+		this.esAuthData = ConfigElasticSearch.getAuthData();
 	}
-
-	public Elasticsearch(String serverUrl) {
-		esServer = serverUrl;
+	
+	public Elasticsearch(String serverUrl, String authType, String authData) {
+		this.esServer = serverUrl;
+		this.esAuthType = authType;
+		this.esAuthData = authData;
+	}
+	
+	private Map<String, String> addAuthHeader(Map<String, String> headers){
+		return Connectors.addAuthHeader(headers, esAuthType, esAuthData);
+	}
+	
+	//HTTP call methods for ES
+	private JSONObject esHttpGET(String url){
+		if (Is.notNullOrEmpty(this.esAuthData)){
+			return Connectors.httpGET(url, null, addAuthHeader(null));
+		}else{
+			return Connectors.httpGET(url);
+		}
+	}
+	private JSONObject esSimpleJsonGET(String url){
+		if (Is.notNullOrEmpty(this.esAuthData)){
+			return Connectors.simpleJsonGet(url, addAuthHeader(null));
+		}else{
+			return Connectors.simpleJsonGet(url);
+		}
+	}
+	private JSONObject esHttpPOST(String url, String queryJson, Map<String, String> headers){
+		if (Is.notNullOrEmpty(this.esAuthData)){
+			headers = addAuthHeader(headers);
+		}
+		return Connectors.httpPOST(url, queryJson, headers);
+	}
+	private JSONObject esHttpDELETE(String url){
+		if (Is.notNullOrEmpty(this.esAuthData)){
+			return Connectors.httpDELETE(url, addAuthHeader(null));
+		}else{
+			return Connectors.httpDELETE(url);
+		}
 	}
 
 	//-------INTERFACE IMPLEMENTATIONS---------
@@ -61,7 +101,7 @@ public class Elasticsearch implements TeachDatabase {
 	@Override
 	public void refresh() {
 		String url = esServer + "/_refresh";
-		JSONObject result = Connectors.httpGET(url);
+		JSONObject result = esHttpGET(url);
 		failOnRestError(url, result);
 	}
 	
@@ -116,7 +156,7 @@ public class Elasticsearch implements TeachDatabase {
 		String pathWithSlash = path.endsWith("/") ? path : path + "/";
 		try {
 			String url = esServer + "/" + pathWithSlash + "_search?q=" + URLEncoder.encode(searchTerm, "UTF-8") + "&from=" + from + "&size=" + size;
-			JSONObject result = Connectors.httpGET(url);
+			JSONObject result = esHttpGET(url);
 			failOnRestError(url, result);
 			return result;
 		} catch (UnsupportedEncodingException e) {
@@ -128,7 +168,7 @@ public class Elasticsearch implements TeachDatabase {
 	public JSONObject searchByJson(String path, String queryJson) {
 		String pathWithSlash = path.endsWith("/") ? path : path + "/";
 		String url = esServer + "/" + pathWithSlash + "_search";
-		JSONObject result = Connectors.httpPOST(url, queryJson, null);
+		JSONObject result = esHttpPOST(url, queryJson, null);
 		failOnRestError(url, result);
 		return result;
 	}
@@ -142,7 +182,7 @@ public class Elasticsearch implements TeachDatabase {
 	@Override
 	public int deleteAnything(String path) {
 		String url = esServer + "/" + path;
-		JSONObject result = Connectors.httpDELETE(url);
+		JSONObject result = esHttpDELETE(url);
 		failOnRestError(url, result);
 		return 0; 		//always 0 or error in this implementation of the interface
 	}
@@ -151,7 +191,7 @@ public class Elasticsearch implements TeachDatabase {
 	public JSONObject deleteByJson(String path, String jsonQuery) {
 		String pathWithSlash = path.endsWith("/") ? path : path + "/";
 		String url = esServer + "/" + pathWithSlash + "_delete_by_query";
-		JSONObject result = Connectors.httpPOST(url, jsonQuery, null);
+		JSONObject result = esHttpPOST(url, jsonQuery, null);
 		failOnRestError(url, result);
 		return result;
 	}
@@ -160,7 +200,7 @@ public class Elasticsearch implements TeachDatabase {
 
 	// Delete path but don't fail with error, e.g. if path doesn't exist
 	public void deleteSilently(String path) {
-		Connectors.httpDELETE(esServer + "/" + path);
+		esHttpDELETE(esServer + "/" + path);
 	}
 	
 	/**
@@ -175,7 +215,7 @@ public class Elasticsearch implements TeachDatabase {
 			throw new RuntimeException("Cannot delete doc, empty id provided (index/type: " + index + "/" + type + ")");
 		}
 		String url = esServer + "/" + index + "/" + type + "/" + id;
-		JSONObject result = Connectors.httpDELETE(url);
+		JSONObject result = esHttpDELETE(url);
 		failOnRestError(url, result);
 	}
 
@@ -214,7 +254,7 @@ public class Elasticsearch implements TeachDatabase {
 		headers.put("Content-Type", "application/json");
 		headers.put("Content-Length", Integer.toString(json.getBytes().length));
 		String url = esServer + "/" + index + "/" + type;
-		JSONObject result = Connectors.httpPOST(url, json, headers);
+		JSONObject result = esHttpPOST(url, json, headers);
 		failOnRestError(url, result);
 		return (String)result.get("_id");
 	}
@@ -228,7 +268,7 @@ public class Elasticsearch implements TeachDatabase {
 	 */
 	public JSONObject getDocument(String index, String type, String id){		
 		String url = esServer + "/" + index + "/" + type + "/" + id;
-		JSONObject result = Connectors.httpGET(url);
+		JSONObject result = esHttpGET(url);
 		failOnRestError(url, result);
 		return result;
 	}
@@ -494,7 +534,7 @@ public class Elasticsearch implements TeachDatabase {
 		String dbIndex = Config.DB_COMMANDS;
 		String dbType = Command.COMMANDS_TYPE;
 		String url = esServer + "/" + dbIndex + "/" + dbType + "/" + docId + "/_source";
-		JSONObject json = Connectors.simpleJsonGet(url);
+		JSONObject json = esSimpleJsonGET(url);
 		JSONArray sentences = (JSONArray) json.get("sentences");
 		boolean foundText = false;
 		for (Object sentenceObj : sentences) {
@@ -588,7 +628,7 @@ public class Elasticsearch implements TeachDatabase {
 		String dbIndex = Config.DB_ANSWERS;
 		String dbType = Answer.ANSWERS_TYPE;
 		String url = esServer + "/" + dbIndex + "/" + dbType + "/" + docId + "/_source";
-		JSONObject sentence = Connectors.simpleJsonGet(url);
+		JSONObject sentence = esSimpleJsonGET(url);
 		String text = sentence.get("text").toString();
 		String language = sentence.get("language").toString();
 		if (text.equals(votedSentence) && language.equalsIgnoreCase(votedLanguage.name())) {

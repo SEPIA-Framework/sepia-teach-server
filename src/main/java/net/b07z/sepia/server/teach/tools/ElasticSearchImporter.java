@@ -269,7 +269,7 @@ class ElasticSearchImporter {
 		if (args.length != 2) {
 			throw new RuntimeException("Usage: " + ElasticSearchImporter.class.getSimpleName() + " <source> <languageCode>");
 		}
-		Elasticsearch es = new Elasticsearch("http://localhost:20724");
+		Elasticsearch es = new Elasticsearch("http://localhost:20724", null, null);
 		//es.setupMapping(Config.DB_COMMANDS);
 		//es.setupMapping(Config.DB_ANSWERS);
 		ElasticSearchImporter prg = new ElasticSearchImporter(es);
@@ -277,7 +277,7 @@ class ElasticSearchImporter {
 		prg.setLanguage(Language.forValue(args[1]));
 		
 		args = new String[]{"import", "en"};
-		prg.run(new File("C:/Users/Florian/workspace/gigaaa-assist-API/src/main/resources/commands/chats_en.txt"));
+		prg.run(new File("../sepia-assist-API/Xtensions/Assistant/commands/chats_en.txt"));
 	}
 
 }
