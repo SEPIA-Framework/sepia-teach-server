@@ -43,6 +43,7 @@ import net.b07z.sepia.server.core.tools.JSON;
 import net.b07z.sepia.server.core.tools.Timer;
 import net.b07z.sepia.server.core.users.Account;
 import net.b07z.sepia.server.teach.database.TeachDatabase;
+import net.b07z.sepia.server.teach.database.TeachUiDataLoader;
 import net.b07z.sepia.server.teach.data.Vote;
 import net.b07z.sepia.server.teach.database.ElasticsearchLogger;
 import net.b07z.sepia.server.teach.database.Feedback;
@@ -173,7 +174,7 @@ public final class Start {
 													Config.apiVersion, Config.localName, Config.localSecret));
 		post("/hello", Start::helloWorld);
 
-		post("/feedback", Start::feedback);
+		post("/getTeachUiServices", Start::getTeachUiServices);
 
 		post("/getCustomCommandMappings", Start::getCustomCommandMappings);
 		post("/setCustomCommandMappings", Start::setCustomCommandMappings);
@@ -188,6 +189,8 @@ public final class Start {
 		// e.g. /addSentence?id=ABCD&language=de&text=new sentenceKEY=...
 		post("/voteSentence", Start::voteSentence);
 		// e.g. /voteSentence?id=ABC12345&vote=positive|negative&text=This is the sentence&language=en&KEY=...'
+		
+		post("/feedback", Start::feedback);
 
 		//TODO: add more tests for answers!
 		post("/addAnswer", Start::addAnswer);
@@ -297,168 +300,27 @@ public final class Start {
 		JSON.add(msg, "reply", reply);
 		return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
 	}
-
-	//--FEEDBACK--
 	
-	static String feedback(Request request, Response response) {
-		
-		//statistics a
-		long tic = System.currentTimeMillis();
-		
-		//prepare parameters
-		RequestParameters params = new RequestGetOrFormParameters(request);
-		
-		//get account
-		Account account = authenticate(params, request, response);
-		//TODO: add role check to see if user is allowed to retrieve feedback or write only
-		
-		//get action (submit, retrieve)
-		String action = params.getString("action");
-				
-		//no action
-		if (action == null || action.trim().isEmpty()){
+	//-- Teach-UI DATA --
+	
+	static String getTeachUiServices(Request request, Response response) {
+		//we could use an account-dependent list of services
+		//RequestParameters params = new RequestGetOrFormParameters(request);
+		//Account account = authenticate(params, request, response);
+		String servicesJson;
+		try{
+			servicesJson = TeachUiDataLoader.getServices(null);		//NOTE: add account here?
+			JSONObject msg = new JSONObject();
+			JSON.add(msg, "result", servicesJson);
+			return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
+			
+		}catch (Exception e){
+			Debugger.printStackTrace(e, 3);
 			JSONObject msg = new JSONObject();
 			JSON.add(msg, "result", "fail");
-			JSON.add(msg, "error", "action attribute missing or invalid! Use e.g. submit, retrieve.");
+			JSON.add(msg, "error", "Could not load data, check teach-server logs for more info.");
 			return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
-		}
-		
-		//get default database for feedback data
-		TeachDatabase db = getDatabase();
-		
-		//submit feedback
-		if (action.trim().equals("submit")){
-			
-			//info (like, report, deprecated: dislike)
-			String info = params.getString("info");
-			String dataStr = params.getString("data");
-			JSONObject data = JSON.parseString(dataStr);
-			
-			//no info?
-			if (info == null || info.trim().isEmpty()){
-				JSONObject msg = new JSONObject();
-				JSON.add(msg, "result", "fail");
-				JSON.add(msg, "error", "info attribute missing or invalid! Use e.g. like, report.");
-				return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
-			}
-			//no data?
-			if (data == null || data.isEmpty()){
-				JSONObject msg = new JSONObject();
-				JSON.add(msg, "result", "fail");
-				JSON.add(msg, "error", "data attribute missing or invalid!");
-				return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
-			}else{
-				//add user id, time stamp and info
-				JSON.add(data, "user", account.getUserID());
-				JSON.add(data, "timestamp", System.currentTimeMillis());
-				if (!data.containsKey("info")){
-					JSON.add(data, "info", info);
-				}
-			}
-			
-			//make id from cleaned text
-			String itemId = JSON.getString(data, "text");
-			if (itemId.isEmpty()){
-				//make id of user and time-stamp
-				itemId = account.getUserID() + "_" + System.currentTimeMillis(); 
-			}else{
-				itemId = Converters.makeIDfromSentence(itemId);
-			}
-			
-			//check
-			if (itemId.isEmpty()){
-				String msg = "{\"result\":\"fail\",\"error\":\"no valid data\"}";
-				return SparkJavaFw.returnResult(request, response, msg, 200);
-			}
-			
-			if (info.equals("like")){
-				Feedback.saveAsync(db, Feedback.INDEX, Feedback.TYPE_LIKE, itemId, data);	 	//set and forget ^^
-				//System.out.println("DB SENT: " + Feedback.INDEX + "/" + Feedback.TYPE_LIKE + "/" + item_id + " - Data: " + data.toJSONString()); 		//debug
-			}
-			else if (info.equals("dislike")){
-				Feedback.saveAsync(db, Feedback.INDEX, Feedback.TYPE_DISLIKE, itemId, data);	 //set and forget ^^
-				//System.out.println("DB SENT: " + Feedback.INDEX + "/" + Feedback.TYPE_DISLIKE + "/" + item_id + " - Data: " + data.toJSONString()); 		//debug
-			}
-			else if (info.equals("report")){
-				Feedback.saveAsync(db, Feedback.INDEX, Feedback.TYPE_REPORT, itemId, data);	 //set and forget ^^
-				//System.out.println("DB SENT: " + Feedback.INDEX + "/" + Feedback.TYPE_REPORT + "/" + item_id + " - Data: " + data.toJSONString()); 		//debug
-			}
-			else if (info.equals("nps")){
-				//we can also use "lang" and "client" parameters to get more details
-				log.info("NPS - " + "id: " + account.getUserID() + " - score: " + data.get("score") + " - comment: " + data.get("comment") + " - TS: " + System.currentTimeMillis());
-			}
-			else{
-				//invalid info
-				JSONObject msg = new JSONObject();
-				JSON.add(msg, "result", "fail");
-				JSON.add(msg, "error", "info attribute missing or invalid! Use e.g. like, report.");
-				return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
-			}
-			
-			//if you come till here that everything has been submitted :-) It might not be successful though as we don't wait for feedback
-			JSONObject msg = new JSONObject();
-			JSON.add(msg, "result", "processing");
-			JSON.add(msg, "duration_ms", Timer.toc(tic));
-			
-			//statistics b
-			Statistics.add_feedback_hit();
-			Statistics.save_feedback_total_time(tic);
-			
-			return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
-		}
-		
-		//get feedback
-		else if (action.trim().equals("retrieve")){
-			
-			//some parameters to match
-			String language = params.getString("language");
-			String user = params.getString("user");
-			String info = params.getString("info"); 		//like, report
-			int from =Integer.parseInt(getOrFail("from", params));
-			int size =Integer.parseInt(getOrFail("size", params));
-			
-			//no info?
-			if (info == null || info.trim().isEmpty()){
-				JSONObject msg = new JSONObject();
-				JSON.add(msg, "result", "fail");
-				JSON.add(msg, "error", "info attribute missing or invalid! Use e.g. like, dislike, report.");
-				return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
-			}
-			
-			//build match filters
-			HashMap<String, Object> filters = new HashMap<>();
-			if (language != null) filters.put("language", language);
-			if (user != null) filters.put("user", user); 
-			
-			JSONArray feedback;
-			if (info.equals("report")){
-				feedback = db.getReportedFeedback(filters, from, size);
-			}else if (info.equals("like")){
-				feedback = db.getLikedFeedback(filters, from, size);
-			}else{
-				JSONObject msg = new JSONObject();
-				JSON.add(msg, "result", "fail");
-				JSON.add(msg, "error", "info attribute missing or invalid! Use e.g. like, dislike, report.");
-				return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
-			}
-			JSONObject result = new JSONObject();
-			JSON.add(result, "result", feedback);
-			
-			//statistics b
-			Statistics.add_KDB_read_hit();
-			Statistics.save_KDB_read_total_time(tic);
-			
-			return SparkJavaFw.returnResult(request, response, result.toJSONString(), 200);
-		}
-		
-		//invalid request
-		else{
-			//no valid action
-			JSONObject msg = new JSONObject();
-			JSON.add(msg, "result", "fail");
-			JSON.add(msg, "error", "action attributes missing or invalid! Use e.g. submit, retrieve.");
-			return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
-		}
+		}		
 	}
 	
 	//-- COMMAND MAPPINGS (CMD -> SERVICE) --
@@ -942,6 +804,169 @@ public final class Start {
 		JSON.add(msg, "result", "success");
 		logDB(request, "voted answer '" + votedSentence + "' as " + vote, votedLanguage, db);
 		return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
+	}
+	
+	//--FEEDBACK--
+	
+	static String feedback(Request request, Response response) {
+		
+		//statistics a
+		long tic = System.currentTimeMillis();
+		
+		//prepare parameters
+		RequestParameters params = new RequestGetOrFormParameters(request);
+		
+		//get account
+		Account account = authenticate(params, request, response);
+		//TODO: add role check to see if user is allowed to retrieve feedback or write only
+		
+		//get action (submit, retrieve)
+		String action = params.getString("action");
+				
+		//no action
+		if (action == null || action.trim().isEmpty()){
+			JSONObject msg = new JSONObject();
+			JSON.add(msg, "result", "fail");
+			JSON.add(msg, "error", "action attribute missing or invalid! Use e.g. submit, retrieve.");
+			return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
+		}
+		
+		//get default database for feedback data
+		TeachDatabase db = getDatabase();
+		
+		//submit feedback
+		if (action.trim().equals("submit")){
+			
+			//info (like, report, deprecated: dislike)
+			String info = params.getString("info");
+			String dataStr = params.getString("data");
+			JSONObject data = JSON.parseString(dataStr);
+			
+			//no info?
+			if (info == null || info.trim().isEmpty()){
+				JSONObject msg = new JSONObject();
+				JSON.add(msg, "result", "fail");
+				JSON.add(msg, "error", "info attribute missing or invalid! Use e.g. like, report.");
+				return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
+			}
+			//no data?
+			if (data == null || data.isEmpty()){
+				JSONObject msg = new JSONObject();
+				JSON.add(msg, "result", "fail");
+				JSON.add(msg, "error", "data attribute missing or invalid!");
+				return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
+			}else{
+				//add user id, time stamp and info
+				JSON.add(data, "user", account.getUserID());
+				JSON.add(data, "timestamp", System.currentTimeMillis());
+				if (!data.containsKey("info")){
+					JSON.add(data, "info", info);
+				}
+			}
+			
+			//make id from cleaned text
+			String itemId = JSON.getString(data, "text");
+			if (itemId.isEmpty()){
+				//make id of user and time-stamp
+				itemId = account.getUserID() + "_" + System.currentTimeMillis(); 
+			}else{
+				itemId = Converters.makeIDfromSentence(itemId);
+			}
+			
+			//check
+			if (itemId.isEmpty()){
+				String msg = "{\"result\":\"fail\",\"error\":\"no valid data\"}";
+				return SparkJavaFw.returnResult(request, response, msg, 200);
+			}
+			
+			if (info.equals("like")){
+				Feedback.saveAsync(db, Feedback.INDEX, Feedback.TYPE_LIKE, itemId, data);	 	//set and forget ^^
+				//System.out.println("DB SENT: " + Feedback.INDEX + "/" + Feedback.TYPE_LIKE + "/" + item_id + " - Data: " + data.toJSONString()); 		//debug
+			}
+			else if (info.equals("dislike")){
+				Feedback.saveAsync(db, Feedback.INDEX, Feedback.TYPE_DISLIKE, itemId, data);	 //set and forget ^^
+				//System.out.println("DB SENT: " + Feedback.INDEX + "/" + Feedback.TYPE_DISLIKE + "/" + item_id + " - Data: " + data.toJSONString()); 		//debug
+			}
+			else if (info.equals("report")){
+				Feedback.saveAsync(db, Feedback.INDEX, Feedback.TYPE_REPORT, itemId, data);	 //set and forget ^^
+				//System.out.println("DB SENT: " + Feedback.INDEX + "/" + Feedback.TYPE_REPORT + "/" + item_id + " - Data: " + data.toJSONString()); 		//debug
+			}
+			else if (info.equals("nps")){
+				//we can also use "lang" and "client" parameters to get more details
+				log.info("NPS - " + "id: " + account.getUserID() + " - score: " + data.get("score") + " - comment: " + data.get("comment") + " - TS: " + System.currentTimeMillis());
+			}
+			else{
+				//invalid info
+				JSONObject msg = new JSONObject();
+				JSON.add(msg, "result", "fail");
+				JSON.add(msg, "error", "info attribute missing or invalid! Use e.g. like, report.");
+				return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
+			}
+			
+			//if you come till here that everything has been submitted :-) It might not be successful though as we don't wait for feedback
+			JSONObject msg = new JSONObject();
+			JSON.add(msg, "result", "processing");
+			JSON.add(msg, "duration_ms", Timer.toc(tic));
+			
+			//statistics b
+			Statistics.add_feedback_hit();
+			Statistics.save_feedback_total_time(tic);
+			
+			return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
+		}
+		
+		//get feedback
+		else if (action.trim().equals("retrieve")){
+			
+			//some parameters to match
+			String language = params.getString("language");
+			String user = params.getString("user");
+			String info = params.getString("info"); 		//like, report
+			int from =Integer.parseInt(getOrFail("from", params));
+			int size =Integer.parseInt(getOrFail("size", params));
+			
+			//no info?
+			if (info == null || info.trim().isEmpty()){
+				JSONObject msg = new JSONObject();
+				JSON.add(msg, "result", "fail");
+				JSON.add(msg, "error", "info attribute missing or invalid! Use e.g. like, dislike, report.");
+				return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
+			}
+			
+			//build match filters
+			HashMap<String, Object> filters = new HashMap<>();
+			if (language != null) filters.put("language", language);
+			if (user != null) filters.put("user", user); 
+			
+			JSONArray feedback;
+			if (info.equals("report")){
+				feedback = db.getReportedFeedback(filters, from, size);
+			}else if (info.equals("like")){
+				feedback = db.getLikedFeedback(filters, from, size);
+			}else{
+				JSONObject msg = new JSONObject();
+				JSON.add(msg, "result", "fail");
+				JSON.add(msg, "error", "info attribute missing or invalid! Use e.g. like, dislike, report.");
+				return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
+			}
+			JSONObject result = new JSONObject();
+			JSON.add(result, "result", feedback);
+			
+			//statistics b
+			Statistics.add_KDB_read_hit();
+			Statistics.save_KDB_read_total_time(tic);
+			
+			return SparkJavaFw.returnResult(request, response, result.toJSONString(), 200);
+		}
+		
+		//invalid request
+		else{
+			//no valid action
+			JSONObject msg = new JSONObject();
+			JSON.add(msg, "result", "fail");
+			JSON.add(msg, "error", "action attributes missing or invalid! Use e.g. submit, retrieve.");
+			return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
+		}
 	}
 	
 	//------------------------------------------------------------------------------

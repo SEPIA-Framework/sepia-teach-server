@@ -28,6 +28,7 @@ public final class Config {
 	
 	//Servers
 	public static String configFile = "Xtensions/teach.properties";		//external configuration file
+	public static String xtensionsFolder = "Xtensions/";				//folder for all sorts of data
 	public static int serverPort = 20722;								//**default server port
 	public static final boolean enableCORS = true;						//enable CORS (set access-control headers)
 	public static String endpointUrl = "http://localhost:20722/";		//**this API URL
