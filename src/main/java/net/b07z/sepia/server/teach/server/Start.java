@@ -551,6 +551,7 @@ public final class Start {
 		//get required parameters:
 		Language language = getLanguage(params);
 		String environment = getOrDefault("environment", "all", params);
+		String deviceId = params.getString("device_id");
 		String sentence = getOrFail("sentence", params);
 		String command = getOrFail("command", params);
 		String publicStr = getOrFail("public", params);
@@ -575,7 +576,7 @@ public final class Start {
 		if ((cmdSummary == null || cmdSummary.isEmpty()) && (paramsJson != null && !paramsJson.isEmpty())){
 			cmdSummary = Converters.makeCommandSummary(command, paramsJson);
 		}
-		String userLocation = params.getString("user_location");		//TODO: The client should keeps this as detailed or vague as required
+		String userLocation = params.getString("user_location");		//TODO: The client should set this as detailed or vague as required
 		String[] repliesArr = params.getStringArray("reply");
 		List<String> replies = repliesArr == null ? new ArrayList<>() : Arrays.asList(repliesArr);
 		//custom button data and stuff
@@ -598,6 +599,7 @@ public final class Start {
 				.setLocal(isLocal)
 				.setExplicit(isExplicit)
 				.setEnvironment(environment)
+				.setDeviceId(deviceId)
 				.setUserLocation(userLocation)
 				.setData(dataJson)
 				//TODO: keep it or remove it? The general answers should be stored in an index called "answers"
@@ -689,11 +691,13 @@ public final class Start {
 		}
 		String language = getOrDefault("language", userAccount.getPreferredLanguage(), params);
 		String from = getOrDefault("from", "0", params);
+		String size = getOrDefault("size", "10", params);
 		String with_button_only = getOrDefault("button", null, params);
 		HashMap<String, Object> filters = new HashMap<>();
 		filters.put("userId", userAccount.getUserID());
 		filters.put("language", language);
 		filters.put("from", from);
+		filters.put("size", size);
 		if (with_button_only != null){
 			filters.put("button", true); 	//Its either true or not included
 		}

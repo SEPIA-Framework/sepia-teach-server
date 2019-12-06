@@ -329,6 +329,7 @@ public class Elasticsearch implements TeachDatabase {
 
 	@Override
 	public JSONArray getPersonalCommands(HashMap<String, Object> filters) {
+		//TODO: this method is mostly identical to: net.b07z.sepia.server.assist.database.DB#getCommands - we should merge it ...
 		
 		//in principle these parameters should already be checked in main, but ...
 		String userIds = (filters.containsKey("userIds"))? (String) filters.get("userIds") : "";
@@ -348,9 +349,9 @@ public class Elasticsearch implements TeachDatabase {
 		StringWriter sw = new StringWriter();
 		try {
 			try (JsonGenerator g = factory.createGenerator(sw)) {
-				startNestedQuery(g, 0);
-
-				//TODO: add info about the "size" of results somewhere here?
+				int from = 0;
+				int size = 10;
+				startNestedQuery(g, from, size);
 
 				// match at least one of the users:
 				g.writeArrayFieldStart("should");
@@ -390,9 +391,9 @@ public class Elasticsearch implements TeachDatabase {
 								g.writeStringField("query", searchText);
 								g.writeStringField("analyzer", "standard"); 		//use: asciifolding filter?
 								if (matchExactText){
-									g.writeStringField("operator", "and");
+									g.writeStringField("operator", "and");			//every word must match
 								}else{
-									g.writeStringField("operator", "or");
+									g.writeStringField("operator", "or");			//at least one word must match
 								}
 								g.writeArrayFieldStart("fields");
 									g.writeString("sentences.text");
@@ -411,6 +412,7 @@ public class Elasticsearch implements TeachDatabase {
 		//System.out.println(sw.toString()); 		//debug
 		
 		JSONObject result = searchByJson(ES_COMMANDS_PATH, sw.toString());
+		//System.out.println(result); 			//debug
 		JSONArray output = new JSONArray();
 		JSONArray hits = JSON.getJArray(result, new String[]{"hits", "hits"});
 		if (hits != null){
@@ -428,7 +430,8 @@ public class Elasticsearch implements TeachDatabase {
 	}
 	@Override
 	public JSONArray getAllPersonalCommands(HashMap<String, Object> filters) {
-		long from = Converters.obj2LongOrDefault(filters.get("from"), -1l);		if (from == -1) from = 0;	
+		long from = Converters.obj2LongOrDefault(filters.get("from"), -1l);		if (from == -1) from = 0;
+		long size = Converters.obj2LongOrDefault(filters.get("size"), 10l);
 		String userId = (String) filters.get("userId");
 		String language = (filters.containsKey("language"))? (String) filters.get("language") : "";
 		boolean with_button_only = filters.containsKey("button"); 		//Note: we don't actually check the value, if its there its true!
@@ -445,6 +448,7 @@ public class Elasticsearch implements TeachDatabase {
 		}
 		JSONObject queryJson = EsQueryBuilder.getNestedBoolMustMatch(nestPath, nestedMatches);
 		JSON.put(queryJson, "from", from);
+		JSON.put(queryJson, "size", size);
 		
 		//collect results
 		JSONObject result = searchByJson(ES_COMMANDS_PATH, queryJson.toJSONString());
@@ -741,9 +745,10 @@ public class Elasticsearch implements TeachDatabase {
 		g.writeEndObject();
 	}
 
-	private void startNestedQuery(JsonGenerator g, int from) throws IOException {
+	private void startNestedQuery(JsonGenerator g, int from, int size) throws IOException {
 		g.writeStartObject();
 		g.writeNumberField("from", from);
+		g.writeNumberField("size", size);
 		g.writeObjectFieldStart("query");
 		g.writeObjectFieldStart("nested");
 		g.writeStringField("path", "sentences");
