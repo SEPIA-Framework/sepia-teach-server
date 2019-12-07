@@ -185,6 +185,8 @@ public final class Start {
 		post("/submitPersonalCommand", Start::submitPersonalCommand);
 		// e.g. /submitPersonalCommand?language=en&sentence=This is the command&command=search&public=yes&reply=reply one&reply=reply two&KEY=...'
 
+		post("/getAllCustomSentencesAsTrainingData", Start::getAllCustomSentencesAsTrainingData);
+		
 		post("/addSentence", Start::addSentence);	// To add a variation that is not a direct translation of an existing sentence.
 		// e.g. /addSentence?id=ABCD&language=de&text=new sentenceKEY=...
 		post("/voteSentence", Start::voteSentence);
@@ -613,6 +615,22 @@ public final class Start {
 	}
 	
 	//-- SENTENCES (of commands) --
+	
+	static String getAllCustomSentencesAsTrainingData(Request request, Response response) {
+		//allow request?
+		requireRole(request, Role.superuser);
+		
+		RequestParameters params = new RequestGetOrFormParameters(request);
+		Language language = getLanguage(params);
+		JSONArray sentencesForTraining = getDatabase().getAllCustomSentencesAsTrainingData(language.toValue());
+		
+		return SparkJavaFw.returnResult(request, response, JSON.make(
+				"result", JSON.make(
+						"language", language, 
+						"sentences", sentencesForTraining
+				)
+		).toJSONString(), 200);
+	}
 
 	static String addSentence(Request request, Response response) {
 		//prepare parameters

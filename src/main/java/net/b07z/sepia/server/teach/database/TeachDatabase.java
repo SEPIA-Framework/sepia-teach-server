@@ -91,10 +91,19 @@ public interface TeachDatabase extends DatabaseInterface{
 	 * <ul>
 	 * <li>userId - id of the user
 	 * <li>language - load results of this language (optional)
+	 * <li>button - get only results that should show up as buttons
 	 * <li>from - starting results from ... (optional, starts with 0)
+	 * <li>size - size of results (optional, defaults to 10)
 	 * </ul>
 	 */
 	JSONArray getAllPersonalCommands(HashMap<String, Object> filters);
+	
+	/**
+	 * Get all custom sentences for a given language with some additional info (e.g. user intent) to be used as training data for ML. 
+	 * @param language - ISO language code
+	 * @return
+	 */
+	JSONArray getAllCustomSentencesAsTrainingData(String language);
 	
 	/**
 	 * Search a command defined by the userId, language and a text to match.

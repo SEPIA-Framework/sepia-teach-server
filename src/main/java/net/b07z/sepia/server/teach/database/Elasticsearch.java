@@ -517,6 +517,34 @@ public class Elasticsearch implements TeachDatabase {
 	}
 	
 	@Override
+	public JSONArray getAllCustomSentencesAsTrainingData(String language) {
+		//build a nested query
+		String nestPath = "sentences";
+		List<QueryElement> nestedMatches = new ArrayList<>(); 
+		nestedMatches.add(new QueryElement(nestPath + ".language", language));
+		int from = 0;
+		int size = 10000;	//try the limit
+		JSONObject queryJson = EsQueryBuilder.getNestedBoolMustMatch(nestPath, nestedMatches);
+		JSON.put(queryJson, "from", from);
+		JSON.put(queryJson, "size", size);
+		
+		//collect results
+		JSONObject result = searchByJson(ES_COMMANDS_PATH, queryJson.toJSONString());
+		JSONArray output = new JSONArray();
+		JSONArray hits = JSON.getJArray(result, new String[]{"hits", "hits"});
+		if (hits != null){
+			for (Object hitObj : hits) {
+				JSONObject hit = (JSONObject) hitObj;
+				JSONObject hitSentence = new JSONObject();
+				JSONObject source = (JSONObject) hit.get("_source");
+				JSON.add(hitSentence, "sentence", source.get("sentences"));
+				JSON.add(output, hitSentence);
+			}
+		}
+		return output;
+	}
+	
+	@Override
 	public void addSentence(String docId, Language language, String text, Account userAccount) {
 		JSONObject json = getDocument(Config.DB_COMMANDS, Command.COMMANDS_TYPE, docId + "/_source");
 		JSONArray sentences = (JSONArray) json.get("sentences");
