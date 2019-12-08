@@ -618,15 +618,15 @@ public final class Start {
 	
 	static String getAllCustomSentencesAsTrainingData(Request request, Response response) {
 		//allow request?
+		RequestParameters params = new RequestGetOrFormParameters(request);
+		authenticate(params, request, response);
 		requireRole(request, Role.superuser);
 		
-		RequestParameters params = new RequestGetOrFormParameters(request);
 		Language language = getLanguage(params);
 		JSONArray sentencesForTraining = getDatabase().getAllCustomSentencesAsTrainingData(language.toValue());
 		
 		return SparkJavaFw.returnResult(request, response, JSON.make(
 				"result", JSON.make(
-						"language", language, 
 						"sentences", sentencesForTraining
 				)
 		).toJSONString(), 200);

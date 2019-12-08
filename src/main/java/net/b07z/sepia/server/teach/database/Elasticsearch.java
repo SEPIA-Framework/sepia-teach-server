@@ -535,10 +535,18 @@ public class Elasticsearch implements TeachDatabase {
 		if (hits != null){
 			for (Object hitObj : hits) {
 				JSONObject hit = (JSONObject) hitObj;
-				JSONObject hitSentence = new JSONObject();
-				JSONObject source = (JSONObject) hit.get("_source");
-				JSON.add(hitSentence, "sentence", source.get("sentences"));
-				JSON.add(output, hitSentence);
+				JSONArray sentences = JSON.getJArray(hit, new String[]{"_source", "sentences"});
+				if (Is.notNullOrEmpty(sentences)){
+					for (Object jo : sentences){
+						JSONObject jsonS = (JSONObject) jo;
+						JSON.add(output, JSON.make(
+								"text", JSON.getString(jsonS, "text"),
+								"cmd_summary", JSON.getString(jsonS, "cmd_summary"),
+								"source", JSON.getString(jsonS, "source"),
+								"language", JSON.getString(jsonS, "language")
+						));
+					}
+				}
 			}
 		}
 		return output;
