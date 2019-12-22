@@ -149,7 +149,7 @@
 				<i>Smart device (smart_device):</i><br>
 				&lt;i_raw&gtRGB Lamp 1<br><br>
 				<i>Room (room):</i><br>
-				{\"value\":\"party_room\", \"value_local\":\"Party room\"}<br><br>
+				{\"value\":\"party_room\", \"value_local\":\"Party room\", \"index\":\"1\"}<br><br>
 				<i>Value (smart_device_value):</i><br>
 				{\"value\":\"[255,0,0]\", \"type\":\"color\"}<br><br>
 			<p><u><b>Example 3:</b></u></p>
@@ -169,7 +169,7 @@
 			"name" : "Smart device (&lt;type&gt;;;tag, e.g.: &lt;light&gt;;;1, &lt;heater&gt;;;Floor2, &lt;sensor&gt;;;P3, ...)"
 		},{
 			"value" : "room",
-			"name" : "Room (&lt;type&gt;, e.g.: &lt;livingroom&gt;, &lt;bedroom&gt;, &lt;kitchen&gt;, ...)",
+			"name" : "Room (&lt;type&gt;;;tag, e.g.: &lt;livingroom&gt;;;1, &lt;bedroom&gt;;;OG2, &lt;kitchen&gt;, ...)",
 			"optional" : true
 		},{
 			"value" : "action",
