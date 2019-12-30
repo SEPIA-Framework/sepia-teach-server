@@ -20,7 +20,7 @@ public final class Config {
 	public static final String SERVERNAME = "SEPIA-Teach-API"; 		//public server name
 	public static String localName = "sepia-teach-server-1";		//**user defined local server name
 	public static String localSecret = "123456";					//**user defined secret to validate local server
-	public static final String apiVersion = "v2.0.4";				//API version
+	public static final String apiVersion = "v2.1.0";				//API version
 	public static String privacyPolicyLink = "";					//Link to privacy policy
 	
 	//helper for dynamic class creation
@@ -28,6 +28,7 @@ public final class Config {
 	
 	//Servers
 	public static String configFile = "Xtensions/teach.properties";		//external configuration file
+	public static String xtensionsFolder = "Xtensions/";				//folder for all sorts of data
 	public static int serverPort = 20722;								//**default server port
 	public static final boolean enableCORS = true;						//enable CORS (set access-control headers)
 	public static String endpointUrl = "http://localhost:20722/";		//**this API URL
@@ -93,6 +94,8 @@ public final class Config {
 			ConfigElasticSearch.endpoint_custom = settings.getProperty("db_elastic_endpoint_custom", "http://localhost:20724");
 			ConfigElasticSearch.endpoint_eu1 = settings.getProperty("db_elastic_endpoint_eu1");
 			ConfigElasticSearch.endpoint_us1 = settings.getProperty("db_elastic_endpoint_us1");
+			ConfigElasticSearch.auth_type = settings.getProperty("db_elastic_auth_type", null);
+			ConfigElasticSearch.auth_data = settings.getProperty("db_elastic_auth_data", null);
 			//more settings
 			allowInternalCalls = Boolean.valueOf(settings.getProperty("allow_internal_calls"));
 			useDatabaseLog = Boolean.valueOf(settings.getProperty("use_db_log"));

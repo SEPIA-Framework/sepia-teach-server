@@ -19,7 +19,8 @@ public class ElasticSearchImporterTest {
 	
 	@Test
 	public void testMakeStringForES() throws IOException{
-		Elasticsearch es = new Elasticsearch(ElasticsearchTest.UNIT_TEST_ES);
+		Elasticsearch es = new Elasticsearch(ElasticsearchTest.UNIT_TEST_ES,
+				ElasticsearchTest.UNIT_TEST_ES_AUTH_TYPE, ElasticsearchTest.UNIT_TEST_ES_AUTH_DATA);
 		String[] args = new String[]{"import", "en"};
 		ElasticSearchImporter prg = new ElasticSearchImporter(es);
 		prg.setSource(args[0]);

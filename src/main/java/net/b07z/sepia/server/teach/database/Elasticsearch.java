@@ -30,6 +30,7 @@ import net.b07z.sepia.server.core.tools.DateTime;
 import net.b07z.sepia.server.core.tools.EsQueryBuilder;
 import net.b07z.sepia.server.core.tools.JSON;
 import net.b07z.sepia.server.core.tools.EsQueryBuilder.QueryElement;
+import net.b07z.sepia.server.core.tools.Is;
 import net.b07z.sepia.server.core.users.Account;
 import net.b07z.sepia.server.teach.data.Vote;
 import net.b07z.sepia.server.teach.server.Config;
@@ -47,13 +48,52 @@ public class Elasticsearch implements TeachDatabase {
 
 	private final JsonFactory factory = new JsonFactory();
 	private final String esServer;
+	private String esAuthType;
+	private String esAuthData;
 
 	public Elasticsearch() {
-		esServer = ConfigElasticSearch.getEndpoint(Config.defaultRegion);
+		this.esServer = ConfigElasticSearch.getEndpoint(Config.defaultRegion);
+		this.esAuthType = ConfigElasticSearch.getAuthType();
+		this.esAuthData = ConfigElasticSearch.getAuthData();
 	}
-
-	public Elasticsearch(String serverUrl) {
-		esServer = serverUrl;
+	
+	public Elasticsearch(String serverUrl, String authType, String authData) {
+		this.esServer = serverUrl;
+		this.esAuthType = authType;
+		this.esAuthData = authData;
+	}
+	
+	private Map<String, String> addAuthHeader(Map<String, String> headers){
+		return Connectors.addAuthHeader(headers, esAuthType, esAuthData);
+	}
+	
+	//HTTP call methods for ES
+	private JSONObject esHttpGET(String url){
+		if (Is.notNullOrEmpty(this.esAuthData)){
+			return Connectors.httpGET(url, null, addAuthHeader(null));
+		}else{
+			return Connectors.httpGET(url);
+		}
+	}
+	private JSONObject esSimpleJsonGET(String url){
+		if (Is.notNullOrEmpty(this.esAuthData)){
+			return Connectors.simpleJsonGet(url, addAuthHeader(null));
+		}else{
+			return Connectors.simpleJsonGet(url);
+		}
+	}
+	private JSONObject esHttpPOST(String url, String queryJson, Map<String, String> headers){
+		if (Is.notNullOrEmpty(this.esAuthData)){
+			headers = addAuthHeader(headers);
+		}
+		return Connectors.httpPOST(url, queryJson, headers);
+	}
+	private JSONObject esHttpDELETE(String url){
+		if (Is.notNullOrEmpty(this.esAuthData)){
+			return Connectors.httpDELETE(url, addAuthHeader(null));
+		}else{
+			return Connectors.httpDELETE(url);
+		}
 	}
 
 	//-------INTERFACE IMPLEMENTATIONS---------
@@ -61,7 +101,7 @@ public class Elasticsearch implements TeachDatabase {
 	@Override
 	public void refresh() {
 		String url = esServer + "/_refresh";
-		JSONObject result = Connectors.httpGET(url);
+		JSONObject result = esHttpGET(url);
 		failOnRestError(url, result);
 	}
 	
@@ -116,7 +156,7 @@ public class Elasticsearch implements TeachDatabase {
 		String pathWithSlash = path.endsWith("/") ? path : path + "/";
 		try {
 			String url = esServer + "/" + pathWithSlash + "_search?q=" + URLEncoder.encode(searchTerm, "UTF-8") + "&from=" + from + "&size=" + size;
-			JSONObject result = Connectors.httpGET(url);
+			JSONObject result = esHttpGET(url);
 			failOnRestError(url, result);
 			return result;
 		} catch (UnsupportedEncodingException e) {
@@ -128,7 +168,7 @@ public class Elasticsearch implements TeachDatabase {
 	public JSONObject searchByJson(String path, String queryJson) {
 		String pathWithSlash = path.endsWith("/") ? path : path + "/";
 		String url = esServer + "/" + pathWithSlash + "_search";
-		JSONObject result = Connectors.httpPOST(url, queryJson, null);
+		JSONObject result = esHttpPOST(url, queryJson, null);
 		failOnRestError(url, result);
 		return result;
 	}
@@ -142,7 +182,7 @@ public class Elasticsearch implements TeachDatabase {
 	@Override
 	public int deleteAnything(String path) {
 		String url = esServer + "/" + path;
-		JSONObject result = Connectors.httpDELETE(url);
+		JSONObject result = esHttpDELETE(url);
 		failOnRestError(url, result);
 		return 0; 		//always 0 or error in this implementation of the interface
 	}
@@ -151,7 +191,7 @@ public class Elasticsearch implements TeachDatabase {
 	public JSONObject deleteByJson(String path, String jsonQuery) {
 		String pathWithSlash = path.endsWith("/") ? path : path + "/";
 		String url = esServer + "/" + pathWithSlash + "_delete_by_query";
-		JSONObject result = Connectors.httpPOST(url, jsonQuery, null);
+		JSONObject result = esHttpPOST(url, jsonQuery, null);
 		failOnRestError(url, result);
 		return result;
 	}
@@ -160,7 +200,7 @@ public class Elasticsearch implements TeachDatabase {
 
 	// Delete path but don't fail with error, e.g. if path doesn't exist
 	public void deleteSilently(String path) {
-		Connectors.httpDELETE(esServer + "/" + path);
+		esHttpDELETE(esServer + "/" + path);
 	}
 	
 	/**
@@ -175,7 +215,7 @@ public class Elasticsearch implements TeachDatabase {
 			throw new RuntimeException("Cannot delete doc, empty id provided (index/type: " + index + "/" + type + ")");
 		}
 		String url = esServer + "/" + index + "/" + type + "/" + id;
-		JSONObject result = Connectors.httpDELETE(url);
+		JSONObject result = esHttpDELETE(url);
 		failOnRestError(url, result);
 	}
 
@@ -214,7 +254,7 @@ public class Elasticsearch implements TeachDatabase {
 		headers.put("Content-Type", "application/json");
 		headers.put("Content-Length", Integer.toString(json.getBytes().length));
 		String url = esServer + "/" + index + "/" + type;
-		JSONObject result = Connectors.httpPOST(url, json, headers);
+		JSONObject result = esHttpPOST(url, json, headers);
 		failOnRestError(url, result);
 		return (String)result.get("_id");
 	}
@@ -228,7 +268,7 @@ public class Elasticsearch implements TeachDatabase {
 	 */
 	public JSONObject getDocument(String index, String type, String id){		
 		String url = esServer + "/" + index + "/" + type + "/" + id;
-		JSONObject result = Connectors.httpGET(url);
+		JSONObject result = esHttpGET(url);
 		failOnRestError(url, result);
 		return result;
 	}
@@ -289,6 +329,7 @@ public class Elasticsearch implements TeachDatabase {
 
 	@Override
 	public JSONArray getPersonalCommands(HashMap<String, Object> filters) {
+		//TODO: this method is mostly identical to: net.b07z.sepia.server.assist.database.DB#getCommands - we should merge it ...
 		
 		//in principle these parameters should already be checked in main, but ...
 		String userIds = (filters.containsKey("userIds"))? (String) filters.get("userIds") : "";
@@ -308,9 +349,9 @@ public class Elasticsearch implements TeachDatabase {
 		StringWriter sw = new StringWriter();
 		try {
 			try (JsonGenerator g = factory.createGenerator(sw)) {
-				startNestedQuery(g, 0);
-
-				//TODO: add info about the "size" of results somewhere here?
+				int from = 0;
+				int size = 10;
+				startNestedQuery(g, from, size);
 
 				// match at least one of the users:
 				g.writeArrayFieldStart("should");
@@ -350,9 +391,9 @@ public class Elasticsearch implements TeachDatabase {
 								g.writeStringField("query", searchText);
 								g.writeStringField("analyzer", "standard"); 		//use: asciifolding filter?
 								if (matchExactText){
-									g.writeStringField("operator", "and");
+									g.writeStringField("operator", "and");			//every word must match
 								}else{
-									g.writeStringField("operator", "or");
+									g.writeStringField("operator", "or");			//at least one word must match
 								}
 								g.writeArrayFieldStart("fields");
 									g.writeString("sentences.text");
@@ -371,6 +412,7 @@ public class Elasticsearch implements TeachDatabase {
 		//System.out.println(sw.toString()); 		//debug
 		
 		JSONObject result = searchByJson(ES_COMMANDS_PATH, sw.toString());
+		//System.out.println(result); 			//debug
 		JSONArray output = new JSONArray();
 		JSONArray hits = JSON.getJArray(result, new String[]{"hits", "hits"});
 		if (hits != null){
@@ -388,7 +430,8 @@ public class Elasticsearch implements TeachDatabase {
 	}
 	@Override
 	public JSONArray getAllPersonalCommands(HashMap<String, Object> filters) {
-		long from = Converters.obj2LongOrDefault(filters.get("from"), -1l);		if (from == -1) from = 0;	
+		long from = Converters.obj2LongOrDefault(filters.get("from"), -1l);		if (from == -1) from = 0;
+		long size = Converters.obj2LongOrDefault(filters.get("size"), 10l);
 		String userId = (String) filters.get("userId");
 		String language = (filters.containsKey("language"))? (String) filters.get("language") : "";
 		boolean with_button_only = filters.containsKey("button"); 		//Note: we don't actually check the value, if its there its true!
@@ -405,6 +448,7 @@ public class Elasticsearch implements TeachDatabase {
 		}
 		JSONObject queryJson = EsQueryBuilder.getNestedBoolMustMatch(nestPath, nestedMatches);
 		JSON.put(queryJson, "from", from);
+		JSON.put(queryJson, "size", size);
 		
 		//collect results
 		JSONObject result = searchByJson(ES_COMMANDS_PATH, queryJson.toJSONString());
@@ -473,6 +517,42 @@ public class Elasticsearch implements TeachDatabase {
 	}
 	
 	@Override
+	public JSONArray getAllCustomSentencesAsTrainingData(String language) {
+		//build a nested query
+		String nestPath = "sentences";
+		List<QueryElement> nestedMatches = new ArrayList<>(); 
+		nestedMatches.add(new QueryElement(nestPath + ".language", language));
+		int from = 0;
+		int size = 10000;	//try the limit
+		JSONObject queryJson = EsQueryBuilder.getNestedBoolMustMatch(nestPath, nestedMatches);
+		JSON.put(queryJson, "from", from);
+		JSON.put(queryJson, "size", size);
+		
+		//collect results
+		JSONObject result = searchByJson(ES_COMMANDS_PATH, queryJson.toJSONString());
+		JSONArray output = new JSONArray();
+		JSONArray hits = JSON.getJArray(result, new String[]{"hits", "hits"});
+		if (hits != null){
+			for (Object hitObj : hits) {
+				JSONObject hit = (JSONObject) hitObj;
+				JSONArray sentences = JSON.getJArray(hit, new String[]{"_source", "sentences"});
+				if (Is.notNullOrEmpty(sentences)){
+					for (Object jo : sentences){
+						JSONObject jsonS = (JSONObject) jo;
+						JSON.add(output, JSON.make(
+								"text", JSON.getString(jsonS, "text"),
+								"cmd_summary", JSON.getString(jsonS, "cmd_summary"),
+								"source", JSON.getString(jsonS, "source"),
+								"language", JSON.getString(jsonS, "language")
+						));
+					}
+				}
+			}
+		}
+		return output;
+	}
+	
+	@Override
 	public void addSentence(String docId, Language language, String text, Account userAccount) {
 		JSONObject json = getDocument(Config.DB_COMMANDS, Command.COMMANDS_TYPE, docId + "/_source");
 		JSONArray sentences = (JSONArray) json.get("sentences");
@@ -494,7 +574,7 @@ public class Elasticsearch implements TeachDatabase {
 		String dbIndex = Config.DB_COMMANDS;
 		String dbType = Command.COMMANDS_TYPE;
 		String url = esServer + "/" + dbIndex + "/" + dbType + "/" + docId + "/_source";
-		JSONObject json = Connectors.simpleJsonGet(url);
+		JSONObject json = esSimpleJsonGET(url);
 		JSONArray sentences = (JSONArray) json.get("sentences");
 		boolean foundText = false;
 		for (Object sentenceObj : sentences) {
@@ -588,7 +668,7 @@ public class Elasticsearch implements TeachDatabase {
 		String dbIndex = Config.DB_ANSWERS;
 		String dbType = Answer.ANSWERS_TYPE;
 		String url = esServer + "/" + dbIndex + "/" + dbType + "/" + docId + "/_source";
-		JSONObject sentence = Connectors.simpleJsonGet(url);
+		JSONObject sentence = esSimpleJsonGET(url);
 		String text = sentence.get("text").toString();
 		String language = sentence.get("language").toString();
 		if (text.equals(votedSentence) && language.equalsIgnoreCase(votedLanguage.name())) {
@@ -701,9 +781,10 @@ public class Elasticsearch implements TeachDatabase {
 		g.writeEndObject();
 	}
 
-	private void startNestedQuery(JsonGenerator g, int from) throws IOException {
+	private void startNestedQuery(JsonGenerator g, int from, int size) throws IOException {
 		g.writeStartObject();
 		g.writeNumberField("from", from);
+		g.writeNumberField("size", size);
 		g.writeObjectFieldStart("query");
 		g.writeObjectFieldStart("nested");
 		g.writeStringField("path", "sentences");

@@ -18,6 +18,8 @@ import net.b07z.sepia.server.teach.database.Elasticsearch;
 public class ElasticsearchTest {
 	
 	public static final String UNIT_TEST_ES = "http://localhost:8080";
+	public static final String UNIT_TEST_ES_AUTH_TYPE = null;
+	public static final String UNIT_TEST_ES_AUTH_DATA = null;
 
 	private static final String index = "myindex";
 	private static final String type = "mytype";
@@ -26,7 +28,7 @@ public class ElasticsearchTest {
 	@Test
 	public void integrationTest() throws IOException {
 		//noinspection unused
-		Elasticsearch es = new Elasticsearch(UNIT_TEST_ES);
+		Elasticsearch es = new Elasticsearch(UNIT_TEST_ES, UNIT_TEST_ES_AUTH_TYPE, UNIT_TEST_ES_AUTH_DATA);
 		writeDoc(es);
 		testGetDocument(es);
 		es.deleteDocument(index, type, id);

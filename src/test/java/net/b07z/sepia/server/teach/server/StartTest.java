@@ -40,7 +40,8 @@ public class StartTest {
 	
 	@BeforeClass
 	public static void setup() throws IOException {
-		es = new Elasticsearch(ElasticsearchTest.UNIT_TEST_ES);
+		es = new Elasticsearch(ElasticsearchTest.UNIT_TEST_ES, 
+				ElasticsearchTest.UNIT_TEST_ES_AUTH_TYPE, ElasticsearchTest.UNIT_TEST_ES_AUTH_DATA);
 		
 		//TODO: clean up DB
 	}
