@@ -134,7 +134,7 @@
 				<i>the assistant does ...</i><br>
 				Control smart home device<br><br>
 				<i>Smart device (smart_device):</i><br>
-				&lt;light&gt;;;Lamp1<br><br>
+				&lt;light&gt;;;Lamp 1<br><br>
 				<i>Room (room):</i><br>
 				&lt;bedroom&gt;<br><br>
 				<i>Action (action):</i><br>
@@ -158,7 +158,7 @@
 				<i>the assistant does ...</i><br>
 				Control smart home device<br><br>
 				<i>Smart device (smart_device):</i><br>
-				&lt;sensor&gt;;;Sensor1<br><br>
+				{\"value\": \"sensor\", \"value_local\": \"Mom\", \"found\": \"mom\", \"index\": 1}<br><br>
 				<i>Action (action):</i><br>
 				&lt;show&gt;<br><br>
 				<i>Custom answer(s):</i><br>
@@ -166,7 +166,7 @@
 			,
 		"parameters" : [{
 			"value" : "smart_device",
-			"name" : "Smart device (&lt;type&gt;;;tag, e.g.: &lt;light&gt;;;1, &lt;heater&gt;;;Floor2, &lt;sensor&gt;;;P3, ...)"
+			"name" : "Smart device (&lt;type&gt;;;tag, e.g.: &lt;light&gt;;;1, &lt;heater&gt;;;Floor 2, &lt;sensor&gt;;;A38, ...)"
 		},{
 			"value" : "room",
 			"name" : "Room (&lt;type&gt;;;tag, e.g.: &lt;livingroom&gt;;;1, &lt;bedroom&gt;;;OG2, &lt;kitchen&gt;, ...)",
