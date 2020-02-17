@@ -307,8 +307,10 @@ public final class Start {
 	
 	static String getTeachUiServices(Request request, Response response) {
 		//we could use an account-dependent list of services
+		
 		//RequestParameters params = new RequestGetOrFormParameters(request);
 		//Account account = authenticate(params, request, response);
+		
 		String servicesJson;
 		try{
 			servicesJson = TeachUiDataLoader.getServices(null);		//NOTE: add account here?
