@@ -181,6 +181,7 @@ public final class Start {
 		
 		post("/getPersonalCommands", Start::getPersonalCommands);
 		post("/getAllPersonalCommands", Start::getAllPersonalCommands);
+		post("/getPersonalCommandsByIds", Start::getPersonalCommandsByIds);
 		post("/deletePersonalCommand", Start::deletePersonalCommand);
 		post("/submitPersonalCommand", Start::submitPersonalCommand);
 		// e.g. /submitPersonalCommand?language=en&sentence=This is the command&command=search&public=yes&reply=reply one&reply=reply two&KEY=...'
@@ -570,6 +571,31 @@ public final class Start {
 		
 		TeachDatabase db = getDatabase();
 		JSONArray output = db.getAllPersonalCommands(filters);
+		JSONObject msg = new JSONObject();
+		JSON.add(msg, "result", output);
+		
+		//statistics b
+		Statistics.add_KDB_read_hit();
+		Statistics.save_KDB_read_total_time(tic);
+		
+		return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
+	}
+	
+	static String getPersonalCommandsByIds(Request request, Response response) {
+		//statistics a
+		long tic = System.currentTimeMillis();
+		
+		//prepare parameters
+		RequestParameters params = new RequestGetOrFormParameters(request);
+		
+		Account userAccount = authenticate(params, request, response);
+		JSONArray ids = params.getJsonArray("ids");
+		if (Is.nullOrEmpty(ids)){
+			throw new RuntimeException("Missing or empty 'ids' parameter");
+		}
+		HashMap<String, Object> filters = new HashMap<>();
+		filters.put("userId", userAccount.getUserID());		//to make sure that this can only be used by the authenticated user
+		JSONArray output = getDatabase().getPersonalCommandsByIds(Converters.jsonArrayToStringList(ids), filters);
 		JSONObject msg = new JSONObject();
 		JSON.add(msg, "result", output);
 		
