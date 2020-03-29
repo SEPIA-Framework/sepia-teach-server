@@ -235,6 +235,10 @@
 			"value" : "data",
 			"name" : "Additional data (e.g. JSON or number)",
 			"optional" : true
+		},{
+			"value" : "reply",
+			"name" : "Custom answer (before calling function)",
+			"optional" : true
 		}]
 	},
 	"platform_controls" : {
