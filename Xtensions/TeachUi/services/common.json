@@ -13,7 +13,8 @@
 			,
 		"parameters" : [{
 			"value" : "reply",
-			"name" : "and says ..."
+			"name" : "and says ...",
+			"type" : "text"
 		}]
 	},
 	"open_link" : {
@@ -32,22 +33,27 @@
 			,
 		"parameters" : [{
 			"value" : "url",
-			"name" : "with URL ..."
+			"name" : "with URL ...",
+			"type" : "text"
 		},{
 			"value" : "answer_set",
-			"name" : "and says ..."
+			"name" : "and says ...",
+			"type" : "text"
 		},{
 			"value" : "title",
 			"name" : "Card title: ",
-			"optional" : true
+			"optional" : true,
+			"type" : "text"
 		},{
 			"value" : "description",
 			"name" : "Card description: ",
-			"optional" : true
+			"optional" : true,
+			"type" : "text"
 		},{
 			"value" : "icon_url",
 			"name" : "Link to card icon (URL): ",
-			"optional" : true
+			"optional" : true,
+			"type" : "text"
 		}]
 	},
 	"music_radio" : {
@@ -72,7 +78,8 @@
 		},{
 			"value" : "url",
 			"name" : "or stream URL (requires station)",
-			"optional" : true
+			"optional" : true,
+			"type" : "text"
 		},{
 			"value" : "action",
 			"name" : "Action (&lt;on&gt; or &lt;off&gt;): ",
@@ -116,11 +123,13 @@
 			,
 		"parameters" : [{
 			"value" : "sentences",
-			"name" : "using these sentences ..."
+			"name" : "using these sentences ...",
+			"type" : "text"
 		},{
 			"value" : "reply",
 			"name" : "and says ...",
-			"optional" : true
+			"optional" : true,
+			"type" : "text"
 		}]
 	},
 	"smartdevice" : {
@@ -182,7 +191,8 @@
 		},{
 			"value" : "reply",
 			"name" : "Custom answer(s). Use &lt;1&gt;, &lt;2&gt; or &lt;3&gt; to ref. device, room or state.",
-			"optional" : true
+			"optional" : true,
+			"type" : "text"
 		}]
 	},
 	"client_controls" : {
@@ -238,7 +248,8 @@
 		},{
 			"value" : "reply",
 			"name" : "Custom answer (before calling function)",
-			"optional" : true
+			"optional" : true,
+			"type" : "text"
 		}]
 	},
 	"platform_controls" : {
@@ -307,10 +318,12 @@
 			,
 		"parameters" : [{
 			"value" : "node_url",
-			"name" : "Mesh-Node URL"
+			"name" : "Mesh-Node URL",
+			"type" : "text"
 		},{
 			"value" : "node_plugin_name",
-			"name" : "Name of plugin"
+			"name" : "Name of plugin",
+			"type" : "text"
 		},{
 			"value" : "node_plugin_data",
 			"name" : "JSON string sent to plugin",
@@ -318,11 +331,13 @@
 		},{
 			"value" : "reply_success",
 			"name" : "Success answer",
-			"optional" : true
+			"optional" : true,
+			"type" : "text"
 		},{
 			"value" : "reply_fail",
 			"name" : "Fail answer",
-			"optional" : true
+			"optional" : true,
+			"type" : "text"
 		}]
 	}
 }
