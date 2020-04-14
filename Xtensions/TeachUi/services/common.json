@@ -175,24 +175,47 @@
 			,
 		"parameters" : [{
 			"value" : "smart_device",
-			"name" : "Smart device (&lt;type&gt;;;tag, e.g.: &lt;light&gt;;;1, &lt;heater&gt;;;Floor 2, &lt;sensor&gt;;;A38, ...)"
+			"name" : "Smart device (Light, Heater, ...)",
+			"examples": {
+				"1": ["&lt;light&gt;;;1", "&lt;heater&gt;;;Floor 2", "&lt;sensor&gt;;;A38", "&lt;device&gt;;;Robo"],
+				"2": [{"value_local": "das Licht", "device_tag": "Deckenleuchte", "value": "light"}],
+				"3": ["Light 2", "Deckenleuchte", "Roller shutter"]
+			}
 		},{
 			"value" : "room",
-			"name" : "Room (&lt;type&gt;;;tag, e.g.: &lt;livingroom&gt;;;1, &lt;bedroom&gt;;;OG2, &lt;kitchen&gt;, ...)",
-			"optional" : true
+			"name" : "Room (living room, kitchen, ...)",
+			"optional" : true,
+			"examples": {
+				"1": ["&lt;livingroom&gt;;;1", "&lt;bath&gt;;;Bad", "&lt;bedroom&gt;;;OG2", "&lt;kitchen&gt;"],
+				"2": [{"value_local": "im Badezimmer", "room_tag": "bad", "value": "bath"}],
+				"3": ["living room, bath", "Wohnzimmer, Bad"]
+			}
 		},{
 			"value" : "action",
-			"name" : "Action (&lt;on&gt;, &lt;off&gt;, &lt;set&gt;, &lt;show&gt;): ",
-			"optional" : true
+			"name" : "Action (on, set, show, ...): ",
+			"optional" : true,
+			"examples": {
+				"1": ["&lt;on&gt;, &lt;off&gt;", "&lt;set&gt;, &lt;show&gt;"],
+				"2": [{"value": "set", "value_local": "setzen"}],
+				"3": ["switch on, switch off", "einschalten, ausschalten"]
+			}
 		},{
 			"value" : "smart_device_value",
-			"name" : "Value (e.g.: &lt;percent&gt;;;50, &lt;plain&gt;;;11 or &lt;i_raw&gt;50%, &lt;i_raw&gt;20°C, ...): ",
-			"optional" : true
+			"name" : "Value (50%, 20°C, ...): ",
+			"optional" : true,
+			"examples": {
+				"1": ["&lt;percent&gt;;;50", "&lt;plain&gt;;;11", "&lt;temperature&gt;;;17°c"],
+				"2": [{"type": "number_temperature_c", "value": "17"}, {"type": "number_percent", "value": "50"}],
+				"3": ["50%, 20°C, 70°F"]
+			}
 		},{
 			"value" : "reply",
-			"name" : "Custom answer(s). Use &lt;1&gt;, &lt;2&gt; or &lt;3&gt; to ref. device, room or state.",
+			"name" : "Custom answer(s)",
 			"optional" : true,
-			"type" : "text"
+			"type" : "text",
+			"examples": {
+				"0": ["Use &lt;1&gt;, &lt;2&gt; or &lt;3&gt; to reference device, room or state."]
+			}
 		}]
 	},
 	"client_controls" : {
