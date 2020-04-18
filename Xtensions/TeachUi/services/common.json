@@ -3,7 +3,36 @@
 		"reply": {
 			"value" : "reply",
 			"name" : "and says ...",
-			"type" : "text"
+			"type" : "text",
+			"examples": {
+				"0": ["You can use &lt;1&gt;, &lt;2&gt;, ... to reference parameters that usually appear in answers for this service. References to the database are possible as well, e.g. &lt;summary_0a&gt;."]
+			}
+		},
+		"url": {
+			"value" : "url",
+			"name" : "with URL ...",
+			"type" : "text",
+			"examples": {
+				"0": ["https://sepia-framework.github.io", "https://example.com/some-api", "https://example.com/some-music-file"]
+			}
+		},
+		"action": {
+			"value" : "action",
+			"name" : "Action (on, off, set ...): ",
+			"examples": {
+				"1": ["&lt;on&gt;", "&lt;off&gt;", "&lt;set&gt;", "&lt;show&gt;"],
+				"2": [{"value": "on", "value_local": "einschalten"}],
+				"3": ["switch on", "switch off", "activate", "increase", "open", "close", "start", "stop"]
+			}
+		},
+		"genre": {
+			"value" : "genre",
+			"name" : "Music genre",
+			"examples": {
+				"1": ["my", "rock", "metal", "hip-hop", "classic", "alternative", "indie", "chill", "blues", "jazz"],
+				"2": [{"value": "classic", "value_local": "Klassik"}],
+				"3": ["my", "rock", "metal", "hip-hop", "classic", "alternative", "indie", "chill", "blues", "jazz"]
+			}
 		}
 	},
 	"commands": {
@@ -20,9 +49,7 @@
 					Make me one with everything.<br><br>"
 				,
 			"parameters" : [{
-				"value" : "reply",
-				"name" : "and says ...",
-				"type" : "text"
+				"alias" : "reply"
 			}]
 		},
 		"open_link" : {
@@ -40,28 +67,30 @@
 					Here is my homepage.<br><br>"
 				,
 			"parameters" : [{
-				"value" : "url",
-				"name" : "with URL ...",
-				"type" : "text"
+				"alias" : "url"
 			},{
-				"value" : "answer_set",
-				"name" : "and says ...",
-				"type" : "text"
+				"alias" : "reply",
+				"value" : "answer_set"
 			},{
 				"value" : "title",
-				"name" : "Card title: ",
+				"name" : "Card title",
 				"optional" : true,
 				"type" : "text"
 			},{
 				"value" : "description",
-				"name" : "Card description: ",
+				"name" : "Card description",
 				"optional" : true,
 				"type" : "text"
 			},{
 				"value" : "icon_url",
-				"name" : "Link to card icon (URL): ",
+				"name" : "Link to card icon (URL)",
 				"optional" : true,
-				"type" : "text"
+				"type" : "text",
+				"examples": {
+					"0": [
+						"Use an URL relative to the client, to your local server or any public resource, e.g.:<p>img/ui/sepia.svg</p><p>http://[sepia-server-ip]:20726/assist/files/images/cards/link.png</p><p>https://sepia-framework.github.io/img/logo.png</p>"
+					]
+				}
 			}]
 		},
 		"music_radio" : {
@@ -78,19 +107,23 @@
 				,
 			"parameters" : [{
 				"value" : "radio_station",
-				"name" : "Radio station ..."
+				"name" : "Radio station ...",
+				"examples": {
+					"1": ["size", "ego_fm_pure", "deluxe_lounge", "1live_diggi", "wdr2"],
+					"2": [{"input": "EgoFM Pure", "value": "ego_fm_pure", "cache_entry": "ego_fm_pure"}],
+					"3": ["Size Radio", "egoFM Pure", "WDR 2"]
+				}
 			},{
-				"value" : "genre",
+				"alias" : "genre",
 				"name" : "or genre ...",
 				"optional" : true
 			},{
-				"value" : "url",
+				"alias" : "url",
 				"name" : "or stream URL (requires station)",
-				"optional" : true,
-				"type" : "text"
+				"optional" : true
 			},{
-				"value" : "action",
-				"name" : "Action (&lt;on&gt; or &lt;off&gt;): ",
+				"alias" : "action",
+				"name" : "Action (start, stop)",
 				"optional" : true
 			}]
 		},
@@ -132,12 +165,15 @@
 			"parameters" : [{
 				"value" : "sentences",
 				"name" : "using these sentences ...",
-				"type" : "text"
+				"examples": {
+					"all": ["Info: This command supports 5 special flexible input parameters: &lt;var1&gt; ... &lt;var5&gt;. See command info for a full explanation."],
+					"1": ["Good morning && Weather in Berlin && Tech news"],
+					"2": [{"array": ["good morning", "weather at home", "tech news"]}],
+					"3": ["Good morning. Show me the weather in Berlin. Show me tech news."]
+				}
 			},{
-				"value" : "reply",
-				"name" : "and says ...",
-				"optional" : true,
-				"type" : "text"
+				"alias" : "reply",
+				"optional" : true
 			}]
 		},
 		"smartdevice" : {
@@ -199,14 +235,8 @@
 					"3": ["living room", "bath", "Wohnzimmer", "Bad"]
 				}
 			},{
-				"value" : "action",
-				"name" : "Action (on, set, show, ...): ",
-				"optional" : true,
-				"examples": {
-					"1": ["&lt;on&gt;", "&lt;off&gt;", "&lt;set&gt;", "&lt;show&gt;"],
-					"2": [{"value": "set", "value_local": "setzen"}],
-					"3": ["switch on", "switch off", "activate", "increase"]
-				}
+				"alias" : "action",
+				"optional" : true
 			},{
 				"value" : "smart_device_value",
 				"name" : "Value (50%, 20°C, ...): ",
@@ -217,13 +247,9 @@
 					"3": ["50%", "20°C", "70°F"]
 				}
 			},{
-				"value" : "reply",
+				"alias" : "reply",
 				"name" : "Custom answer(s)",
-				"optional" : true,
-				"type" : "text",
-				"examples": {
-					"0": ["You can use &lt;1&gt;, &lt;2&gt; or &lt;3&gt; to reference device, room or state."]
-				}
+				"optional" : true
 			}]
 		},
 		"client_controls" : {
