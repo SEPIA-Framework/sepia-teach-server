@@ -25,13 +25,42 @@
 				"3": ["switch on", "switch off", "activate", "increase", "open", "close", "start", "stop"]
 			}
 		},
+		"number": {
+			"value" : "number",
+			"name" : "Number (11, 50%, 5$, ...): ",
+			"examples": {
+				"1": ["11", "50%", "5$"],
+				"2": [{"input": "5$", "type": "currency", "value": "5"}, {"input": "2 persons", "type": "persons", "value": "2"}],
+				"3": ["11", "5 Dollar", "50 percent", "2 persons"]
+			}
+		},
 		"genre": {
 			"value" : "genre",
 			"name" : "Music genre",
 			"examples": {
 				"1": ["my", "rock", "metal", "hip-hop", "classic", "alternative", "indie", "chill", "blues", "jazz"],
-				"2": [{"value": "classic", "value_local": "Klassik"}],
+				"2": [{"value": "classic", "found": "klassik", "value_local": "Klassik"}],
 				"3": ["my", "rock", "metal", "hip-hop", "classic", "alternative", "indie", "chill", "blues", "jazz"]
+			}
+		},
+		"media_controls" : {
+			"value" : "media_controls",
+			"name" : "Media control (play, pause, next, ...)",
+			"optional" : true,
+			"examples": {
+				"1": ["&lt;play&gt;", "&lt;pause&gt;", "&lt;resume&gt;", "&lt;volume_up&gt;", "&lt;next&gt;"],
+				"2": [{"value_local": "stoppen", "value": "stop"}],
+				"3": ["next", "forward", "continue", "resume"]
+			}
+		},
+		"data": {
+			"value" : "data",
+			"name" : "Generic data (JSON or value)",
+			"type" : "generic",
+			"examples": {
+				"1": ["my data", "42"],
+				"2": [{"value":42}, {"value":"my data", "isGeneric":true}, {"value":{"text":"Hello", "type":"World"}}],
+				"3": ["NOT-SUPPORTED"]
 			}
 		}
 	},
@@ -266,10 +295,19 @@
 					<i>Action (action):</i><br>
 					&lt;set&gt;<br><br>
 					<i>Function (client_fun):</i><br>
-					volume<br><br>
-					<i>Additional data (data):</i><br>
+					&lt;volume&gt;<br><br>
+					<i>Generic data (data):</i><br>
 					11<br><br>
 				<p><u><b>Example 2:</b></u></p>
+					<i>When I say ...</i>
+					<br>More Rock<br><br>
+					<i>the assistant does ...</i><br>
+					Execute a client control function<br><br>
+					<i>Function (client_fun):</i><br>
+					&lt;media&gt;<br><br>
+					<i>Media controls (media_controls):</i><br>
+					&lt;next&gt;<br><br>
+				<p><u><b>Example 3:</b></u></p>
 					<i>When I say ...</i>
 					<br>Call my node plugin<br><br>
 					<i>the assistant does ...</i><br>
@@ -277,10 +315,10 @@
 					<i>Action (action):</i><br>
 					&lt;on&gt;<br><br>
 					<i>Function (client_fun):</i><br>
-					meshNode<br><br>
-					<i>Additional data (data):</i><br>
-					{ \"url\": \"http://localhost:20780\", \"plugin\": \"RuntimePlugin\", \"data\": {\"command\": [\"echo\", \"test\"] } }<br><br>
-				<p><u><b>Example 3:</b></u></p>
+					&lt;meshNode&gt;<br><br>
+					<i>Generic data (data):</i><br>
+					{ \"value\": { \"url\": \"http://localhost:20780\", \"plugin\": \"RuntimePlugin\", \"data\": {\"command\": [\"echo\", \"test\"] } } }<br><br>
+				<p><u><b>Example 4:</b></u></p>
 					<i>When I say ...</i>
 					<br>Broadcast hello with CLEXI<br><br>
 					<i>the assistant does ...</i><br>
@@ -288,25 +326,33 @@
 					<i>Action (action):</i><br>
 					&lt;on&gt;<br><br>
 					<i>Function (client_fun):</i><br>
-					clexi<br><br>
+					&lt;clexi&gt;<br><br>
 					<i>Additional data (data):</i><br>
-					{ \"xtension\": \"clexi-broadcaster\", \"data\": { \"text\": \"Hello\", \"sender\": \"Me\" } }<br><br>"
+					{ \"value\": { \"xtension\": \"clexi-broadcaster\", \"data\": { \"text\": \"Hello\", \"sender\": \"Me\" } } }<br><br>"
 				,
 			"parameters" : [{
-				"value" : "action",
-				"name" : "Action (e.g.: &lt;on&gt;, &lt;increase&gt; or &lt;set&gt;): "
+				"alias" : "action"
 			},{
 				"value" : "client_fun",
-				"name" : "Function (e.g.: settings, volume, alwaysOn, media, ...): "
+				"name" : "Function (volume, view, runtime, ...)",
+				"examples": {
+					"1": ["&lt;settings&gt;", "&lt;volume&gt;", "&lt;alwaysOn&gt;", "&lt;media&gt;", "&lt;clexi&gt;", "&lt;runtimeCommands&gt;"],
+					"2": [{"value_local": "the media player", "value": "media"}],
+					"3": ["media player", "settings", "volume", "always-on mode"]
+				}
 			},{
-				"value" : "data",
-				"name" : "Additional data (e.g. JSON or number)",
+				"alias" : "media_controls",
 				"optional" : true
 			},{
-				"value" : "reply",
+				"alias" : "data",
+				"optional" : true
+			},{
+				"alias" : "number",
+				"optional" : true
+			},{
+				"alias" : "reply",
 				"name" : "Custom answer (before calling function)",
-				"optional" : true,
-				"type" : "text"
+				"optional" : true
 			}]
 		},
 		"platform_controls" : {
@@ -320,39 +366,54 @@
 					<i>the assistant does ...</i><br>
 					Execute platform specific actions<br><br>
 					<i>Actions for specific device IDs (device_fun):</i><br>
-					{ \"a1\": {\"type\": \"androidActivity\", \"data\": {\"action\": \"android.media.action.MEDIA_PLAY_FROM_SEARCH\", \"extras\": {\"query\": \"Paradise City\"} }} }<br><br>
+					{ \"value\": { \"a1\": {\"type\": \"androidActivity\", \"data\": {\"action\": \"android.media.action.MEDIA_PLAY_FROM_SEARCH\", \"extras\": {\"query\": \"Paradise City\"} }} } }<br><br>
 				<p><u><b>Example 2:</b></u></p>
 					<i>When I say ...</i>
 					<br>Start Paradise City<br><br>
 					<i>the assistant does ...</i><br>
 					Execute platform specific actions<br><br>
 					<i>Android specific Intent or URL (android_fun):</i><br>
-					{\"type\": \"androidActivity\", \"data\": {\"action\": \"android.media.action.MEDIA_PLAY_FROM_SEARCH\", \"extras\": {\"query\": \"Paradise City\"} } }<br><br>
+					{ \"value\": {\"type\": \"androidActivity\", \"data\": {\"action\": \"android.media.action.MEDIA_PLAY_FROM_SEARCH\", \"extras\": {\"query\": \"Paradise City\"} } } }<br><br>
 					<i>Browser specific function or URL (browser_fun):</i><br>
-					{\"type\": \"url\", \"data\": {\"url\": \"spotify:track:3YBZIN3rekqsKxbJc9FZko:play\"} }<br><br>"
+					{ \"value\": {\"type\": \"url\", \"data\": {\"url\": \"spotify:track:3YBZIN3rekqsKxbJc9FZko:play\"} } }<br><br>"
 					,
-			"parameters" : [{
-				"value" : "device_fun",
-				"name" : "Actions for specific device IDs: "
+			"parameters": [{
+				"value": "device_fun",
+				"name": "Actions for specific device IDs",
+				"type": "generic",
+				"examples": {
+					"1": ["NOT-SUPPORTED"],
+					"2": [{"value": {"a1": {"type": "androidActivity", "data": {"action": "android.media.action.MEDIA_PLAY_FROM_SEARCH", "extras": {"query": "Paradise City"}}}}}],
+					"3": ["NOT-SUPPORTED"]
+				}
 			},{
-				"value" : "android_fun",
-				"name" : "Android specific Intent or URL (androidActivity): "
+				"value": "android_fun",
+				"name": "Android specific Intent or URL (androidActivity)",
+				"type": "generic",
+				"examples": {
+					"1": ["NOT-SUPPORTED"],
+					"2": [{"value": {"type": "androidActivity", "data": {"action": "android.media.action.MEDIA_PLAY_FROM_SEARCH", "extras": {"query": "Paradise City"}}}}],
+					"3": ["NOT-SUPPORTED"]
+				}
 			},{
-				"value" : "ios_fun",
-				"name" : "iOS specific action (iosIntent): "
+				"value": "browser_fun",
+				"name": "Browser specific function or URL (browserIntent, url)",
+				"type": "generic"
 			},{
-				"value" : "browser_fun",
-				"name" : "Browser specific function or URL (browserIntent, url): "
+				"value": "ios_fun",
+				"name": "iOS specific action (iosIntent)",
+				"type": "generic"
 			},{
-				"value" : "windows_fun",
-				"name" : "Windows specific action (windowsIntent): "
+				"value": "windows_fun",
+				"name": "Windows specific action (windowsIntent)",
+				"type": "generic"
 			}]
 		},
 		"mesh_node_plugin" : {
 			"command" : "mesh_node_plugin",
 			"name" : "Call SEPIA Mesh-Node plugin",
 			"desc" : "Use this command to call a <a href='https://github.com/SEPIA-Framework/sepia-mesh-nodes' target='_blank'>SEPIA Mesh-Node</a> plugin via the SEPIA server. 
-					In contrast to the client-controls version this command is secured by your SEPIA account and evaluated by the server which leads to some extra features. 
+					In contrast to the client-controls version this command is secured by your SEPIA account and evaluated by the server which enables some extra features. 
 					Note that the given URL referes to a path relative to the server as well and can be an IP inside your private home network where your SEPIA server is located. 
 					You can refer to results of the Mesh-Node plugin call inside your success or fail answers. To do this use the variable &lt;result_KEY&gt; where 'KEY' refers to a 
 					data field in your plugin result data, e.g. 'hello' in the 'HelloPlugin' example."
@@ -367,7 +428,7 @@
 					<i>Name of plugin (node_plugin_name):</i><br>
 					HelloPlugin<br><br>
 					<i>JSON string sent to plugin (node_plugin_data):</i><br>
-					{\"name\":\"Boss\"}<br><br>
+					{ \"value\": {\"name\":\"Boss\"} }<br><br>
 					<i>Success answer (reply_success):</i><br>
 					Ok I understood &lt;result_hello&gt;<br><br>
 					<i>Fail answer (reply_fail):</i><br>
@@ -376,20 +437,35 @@
 			"parameters" : [{
 				"value" : "node_url",
 				"name" : "Mesh-Node URL",
-				"type" : "text"
+				"type" : "text",
+				"examples": {
+					"0": ["http://localhost:20780"]
+				}
 			},{
 				"value" : "node_plugin_name",
 				"name" : "Name of plugin",
-				"type" : "text"
+				"type" : "text",
+				"examples": {
+					"0": ["HelloPlugin"]
+				}
 			},{
 				"value" : "node_plugin_data",
 				"name" : "JSON string sent to plugin",
-				"optional" : true
+				"optional" : true,
+				"type": "generic",
+				"examples": {
+					"1": ["NOT-SUPPORTED"],
+					"2": [{"value": {"name": "Boss"}}],
+					"3": ["NOT-SUPPORTED"]
+				}
 			},{
 				"value" : "reply_success",
 				"name" : "Success answer",
 				"optional" : true,
-				"type" : "text"
+				"type" : "text",
+				"examples": {
+					"0": ["Ok I understood &lt;result_hello&gt;"]
+				}
 			},{
 				"value" : "reply_fail",
 				"name" : "Fail answer",
