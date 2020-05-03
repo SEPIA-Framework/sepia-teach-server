@@ -117,7 +117,7 @@
 				"type" : "text",
 				"examples": {
 					"0": [
-						"Use an URL relative to the client, to your local server or any public resource, e.g.:<p>img/ui/sepia.svg</p><p>http://[sepia-server-ip]:20726/assist/files/images/cards/link.png</p><p>https://sepia-framework.github.io/img/logo.png</p>"
+						"Use an URL relative to the client, to your local server or any public resource, e.g.:<p>img/icon.png</p><p>http://[sepia-server-ip]:20726/assist/files/images/cards/link.png</p><p>https://sepia-framework.github.io/img/logo.png</p>"
 					]
 				}
 			}]
