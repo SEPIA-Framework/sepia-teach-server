@@ -2,6 +2,7 @@ package net.b07z.sepia.server.teach.database;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.json.simple.JSONArray;
@@ -97,6 +98,13 @@ public interface TeachDatabase extends DatabaseInterface{
 	 * </ul>
 	 */
 	JSONArray getAllPersonalCommands(HashMap<String, Object> filters);
+	
+	/**
+	 * Get personal commands by IDs and optionally with filters to verify IDs.
+	 * @param ids - array of command IDs to look for
+	 * @param filters - currently only: userId
+	 */
+	JSONArray getPersonalCommandsByIds(List<String> ids, Map<String, Object> filters);
 	
 	/**
 	 * Get all custom sentences for a given language with some additional info (e.g. user intent) to be used as training data for ML. 

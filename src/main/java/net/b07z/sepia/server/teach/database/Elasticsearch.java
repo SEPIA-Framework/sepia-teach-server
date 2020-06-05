@@ -468,12 +468,49 @@ public class Elasticsearch implements TeachDatabase {
 		return output;
 	}
 	@Override
+	public JSONArray getPersonalCommandsByIds(List<String> ids, Map<String, Object> filters){
+		String userId = null;
+		if (filters != null){
+			userId = (String) filters.get("userId");
+		}
+		//build a should query and filter later
+		List<QueryElement> rootShouldMatches = new ArrayList<>();
+		for (String id : ids){
+			rootShouldMatches.add(new QueryElement("_id", id));
+		}
+		
+		JSONObject queryJson = EsQueryBuilder.getBoolShouldMatch(rootShouldMatches);
+		JSON.put(queryJson, "from", 0);
+		JSON.put(queryJson, "size", ids.size());
+
+		//collect results
+		JSONObject result = searchByJson(ES_COMMANDS_PATH, queryJson.toJSONString());
+		JSONArray output = new JSONArray();
+		JSONArray hits = JSON.getJArray(result, new String[]{"hits", "hits"});
+		if (hits != null){
+			for (Object hitObj : hits) {
+				JSONObject hit = (JSONObject) hitObj;
+				JSONObject hitSentence = new JSONObject();
+				JSONObject source = (JSONObject) hit.get("_source");
+				JSONArray sentences = JSON.getJArray(source, "sentences");
+				if (Is.notNullOrEmpty(userId) && !JSON.getString(sentences, 0, "user").equals(userId)){
+					continue;
+				}
+				JSON.add(hitSentence, "sentence", sentences);
+				String id = (String) hit.get("_id");
+				JSON.add(hitSentence, "id", id);
+				JSON.add(output, hitSentence);
+			}
+		}
+		return output;
+	}
+	@Override
 	public String getIdOfCommand(String userId, String language, String textToMatch){
 		HashMap<String, Object> getFilters = new HashMap<String, Object>();
 		getFilters.put("userIds", userId);
 		getFilters.put("language", language);
 		getFilters.put("searchText", textToMatch);
-		getFilters.put("matchExactText", new Boolean(true));
+		getFilters.put("matchExactText", true);
 		
 		JSONArray matchingSentences = getPersonalCommands(getFilters);
 		String itemId = "";
