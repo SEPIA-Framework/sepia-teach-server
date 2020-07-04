@@ -181,6 +181,7 @@ public final class Start {
 		
 		post("/getPersonalCommands", Start::getPersonalCommands);
 		post("/getAllPersonalCommands", Start::getAllPersonalCommands);
+		post("/getAllCustomAssistantCommands", Start::getAllCustomAssistantCommands);
 		post("/getPersonalCommandsByIds", Start::getPersonalCommandsByIds);
 		post("/deletePersonalCommand", Start::deletePersonalCommand);
 		post("/submitPersonalCommand", Start::submitPersonalCommand);
@@ -311,15 +312,25 @@ public final class Start {
 		
 		//RequestParameters params = new RequestGetOrFormParameters(request);
 		//Account account = authenticate(params, request, response);
+		long tic = System.currentTimeMillis();
 		
 		String servicesJson;
 		try{
 			servicesJson = TeachUiDataLoader.getServices(null);		//NOTE: add account here?
+			
+			//statistics
+			Statistics.addOtherApiHit("getTeachUiServices");
+	      	Statistics.addOtherApiTime("getTeachUiServices", tic);
+	      	
 			JSONObject msg = new JSONObject();
 			JSON.add(msg, "result", servicesJson);
 			return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
 			
 		}catch (Exception e){
+			//statistics
+			Statistics.addOtherApiHit("getTeachUiServices ERROR");
+	      	Statistics.addOtherApiTime("getTeachUiServices ERROR", tic);
+	      	
 			Debugger.printStackTrace(e, 3);
 			JSONObject msg = new JSONObject();
 			JSON.add(msg, "result", "fail");
@@ -353,8 +364,8 @@ public final class Start {
 		JSON.add(msg, "result", data);
 		
 		//statistics
-		Statistics.add_KDB_read_hit();
-		Statistics.save_KDB_read_total_time(tic);
+		Statistics.addOtherApiHit("getCustomCommandMappings");
+      	Statistics.addOtherApiTime("getCustomCommandMappings", tic);
 				
 		return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
 	}
@@ -393,8 +404,8 @@ public final class Start {
 		db.setCustomCommandMappings(userId, customOrSystem, cmSet, filters);
 		
 		//statistics
-		Statistics.add_KDB_write_hit();
-		Statistics.save_KDB_write_total_time(tic);
+		Statistics.addOtherApiHit("setCustomCommandMappings");
+      	Statistics.addOtherApiTime("setCustomCommandMappings", tic);
 		
 		return SparkJavaFw.sendSuccessResponse(request, response);
 	}
@@ -515,13 +526,13 @@ public final class Start {
 	}
 	
 	static String getPersonalCommands(Request request, Response response) {
-		//statistics a
-		long tic = System.currentTimeMillis();
-		
 		//prepare parameters
 		RequestParameters params = new RequestGetOrFormParameters(request);
 		
 		Account userAccount = authenticate(params, request, response);
+		//statistics a
+		long tic = System.currentTimeMillis();
+		
 		Language language = getLanguage(params);
 		boolean includePublic = getOrDefault("include_public", true, params); 		//default is with public now
 		String searchText = getOrDefault("searchText", "", params);				//in case we only want certain results matching the search text
@@ -538,8 +549,8 @@ public final class Start {
 		JSON.add(msg, "result", output);
 		
 		//statistics b
-		Statistics.add_KDB_read_hit();
-		Statistics.save_KDB_read_total_time(tic);
+		Statistics.addOtherApiHit("getPersonalCommands");
+      	Statistics.addOtherApiTime("getPersonalCommands", tic);
 		
 		return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
 	}
@@ -556,29 +567,59 @@ public final class Start {
 		if (userId == null || userId.isEmpty()){
 			throw new RuntimeException("Cannot load commands, userId is invalid!");
 		}
-		String language = getOrDefault("language", userAccount.getPreferredLanguage(), params);
+				
+		JSONArray output = getSpecificPersonalCommands(userAccount.getUserID(), userAccount.getPreferredLanguage(), params);
+		JSONObject msg = new JSONObject();
+		JSON.add(msg, "result", output);
+		
+		//statistics b
+		Statistics.addOtherApiHit("getAllPersonalCommands");
+      	Statistics.addOtherApiTime("getAllPersonalCommands", tic);
+		
+		return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
+	}
+	static String getAllCustomAssistantCommands(Request request, Response response){
+		//statistics a
+		long tic = System.currentTimeMillis();
+		
+		//prepare parameters
+		RequestParameters params = new RequestGetOrFormParameters(request);
+		
+		Account userAccount = authenticate(params, request, response);
+		String userId = userAccount.getUserID();
+		if (userId == null || userId.isEmpty()){
+			throw new RuntimeException("Cannot load commands, userId is invalid!");
+		}
+		if (userId.equals(ConfigDefaults.defaultAssistantUserId)){
+			throw new RuntimeException("User ID and assistant ID are identical. Use 'getAllPersonalCommands' instead!");
+		}
+				
+		JSONArray output = getSpecificPersonalCommands(ConfigDefaults.defaultAssistantUserId, userAccount.getPreferredLanguage(), params);
+		JSONObject msg = new JSONObject();
+		JSON.add(msg, "result", output);
+		
+		//statistics b
+		Statistics.addOtherApiHit("getAllCustomAssistantCommands");
+      	Statistics.addOtherApiTime("getAllCustomAssistantCommands", tic);
+		
+		return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
+	}
+	private static JSONArray getSpecificPersonalCommands(String userId, String userLanguage, RequestParameters params){
+		String language = getOrDefault("language", userLanguage, params);
 		String from = getOrDefault("from", "0", params);
 		String size = getOrDefault("size", "10", params);
 		String with_button_only = getOrDefault("button", null, params);
 		HashMap<String, Object> filters = new HashMap<>();
-		filters.put("userId", userAccount.getUserID());
+		filters.put("userId", userId);
 		filters.put("language", language);
 		filters.put("from", from);
 		filters.put("size", size);
 		if (with_button_only != null){
 			filters.put("button", true); 	//Its either true or not included
 		}
-		
 		TeachDatabase db = getDatabase();
 		JSONArray output = db.getAllPersonalCommands(filters);
-		JSONObject msg = new JSONObject();
-		JSON.add(msg, "result", output);
-		
-		//statistics b
-		Statistics.add_KDB_read_hit();
-		Statistics.save_KDB_read_total_time(tic);
-		
-		return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
+		return output;
 	}
 	
 	static String getPersonalCommandsByIds(Request request, Response response) {
@@ -600,8 +641,8 @@ public final class Start {
 		JSON.add(msg, "result", output);
 		
 		//statistics b
-		Statistics.add_KDB_read_hit();
-		Statistics.save_KDB_read_total_time(tic);
+		Statistics.addOtherApiHit("getPersonalCommandsByIds");
+      	Statistics.addOtherApiTime("getPersonalCommandsByIds", tic);
 		
 		return SparkJavaFw.returnResult(request, response, msg.toJSONString(), 200);
 	}
