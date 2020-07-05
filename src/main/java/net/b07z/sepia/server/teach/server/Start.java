@@ -593,8 +593,9 @@ public final class Start {
 		if (userId.equals(ConfigDefaults.defaultAssistantUserId)){
 			throw new RuntimeException("User ID and assistant ID are identical. Use 'getAllPersonalCommands' instead!");
 		}
-				
-		JSONArray output = getSpecificPersonalCommands(ConfigDefaults.defaultAssistantUserId, userAccount.getPreferredLanguage(), params);
+		
+		String language = userAccount.getPreferredLanguage();		//NOTE: by default it will use USER language, but can be overwritten via "language" parameter
+		JSONArray output = getSpecificPersonalCommands(ConfigDefaults.defaultAssistantUserId, language, params);
 		JSONObject msg = new JSONObject();
 		JSON.add(msg, "result", output);
 		
