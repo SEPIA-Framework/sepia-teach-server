@@ -229,7 +229,7 @@
 					<i>the assistant does ...</i><br>
 					Control smart home device<br><br>
 					<i>Smart device (smart_device):</i><br>
-					&lt;i_raw&gtRGB Lamp 1<br><br>
+					&lt;i_raw&gt;RGB Lamp 1<br><br>
 					<i>Room (room):</i><br>
 					{\"value\":\"party_room\", \"value_local\":\"Party room\", \"index\":\"1\"}<br><br>
 					<i>Value (smart_device_value):</i><br>
