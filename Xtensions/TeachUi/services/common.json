@@ -159,7 +159,7 @@
 		"sentence_connect" : {
 			"command" : "sentence_connect",
 			"name" : "Execute command(s)",
-			"desc" : "Use this command to define an alias for one or more other commands. If you define more than one sentence (seperated by '.') they will be called one after the other. 
+			"desc" : "Use this command to define an alias for one or more other commands. If you define more than one sentence (seperated by '.') they will be called one after the other (if the client supports it!). 
 					This command supports 5 special flexible input parameters: &lt;var1&gt; ... &lt;var5&gt;, see example 2. 
 					Each 'var' represents exactly one word, consecutive 'var' are combined to one parameter (e.g. you need '&lt;var1&gt; &lt;var1&gt; &lt;var1&gt;' to match 'Statue of Liberty'), see example 3. 
 					Note: you cannot use sentences that you've previously defined yourself.",
@@ -407,6 +407,54 @@
 				"value": "windows_fun",
 				"name": "Windows specific action (windowsIntent)",
 				"type": "generic"
+			}]
+		},
+		"frame_control" : {
+			"command" : "frame_control",
+			"name" : "Control custom frame",
+			"desc" : "Use this command to control a custom frame (open/close/set data) if the client supports it. Custom frames are code pieces (usually mini HTML pages) that can be started/stopped, hook into the normal even cycle (input-response-action) and temporarily add additonal functionality to the client.",
+			"help" : "<p><u><b>Example:</b></u></p>
+					<i>When I say ...</i>
+					<br>Open my demo controls panel<br><br>
+					<i>the assistant does ...</i><br>
+					Control custom frame<br><br>
+					<i>Path to frame file (URL):</i><br>
+					&lt;assist_server&gt;/views/custom-view-demo.html<br><br>
+					<i>Action (action):</i><br>
+					&lt;on&gt;<br><br>
+					<i>and says ... (reply):</i><br>
+					Here is your panel.<br><br>
+				<p><u><b>Example 2:</b></u></p>
+					<i>When I say ...</i>
+					<br>_demo_frame_ Select TEST<br><br>
+					<i>the assistant does ...</i><br>
+					Control custom frame<br><br>
+					<i>Action (action):</i><br>
+					&lt;set&gt;<br><br>
+					<i>Frame data (JSON string):</i><br>
+					{\"functionName\": \"test\", \"data\": \"my_data\"}<br><br>
+					<i>and says ... (reply):</i><br>
+					Selecting TEST.<br><br>"
+				,
+			"parameters" : [{
+				"alias" : "action"
+			},{
+				"alias" : "url",
+				"name" : "Path to frame file (URL)",
+				"examples": {
+					"0": ["&lt;assist_server&gt;/views/custom-view-demo.html", "&lt;custom_data&gt;/demo-view.html"]
+				}
+			},{
+				"alias" : "data",
+				"name" : "Frame data (JSON string)",
+				"examples": {
+					"1": ["NOT-SUPPORTED"],
+					"2": [{"functionName": "test", "data": "my_data"}, {"onOpen": "sayHelloOnOpen", "onSpeechToTextInputHandler": "handleSttData", "onChatOutputHandler": "handleChatOutput"}],
+					"3": ["NOT-SUPPORTED"]
+				}
+			},{
+				"alias" : "reply",
+				"optional" : true
 			}]
 		},
 		"mesh_node_plugin" : {
