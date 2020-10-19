@@ -422,6 +422,8 @@
 					&lt;assist_server&gt;/views/custom-view-demo.html<br><br>
 					<i>Action (action):</i><br>
 					&lt;on&gt;<br><br>
+					<i>Frame data (JSON string):</i><br>
+					{\"onOpen\": \"sayHelloOnOpen\", \"onSpeechToTextInputHandler\": \"handleSttData\", \"onChatOutputHandler\": \"handleChatOutput\"}<br><br>
 					<i>and says ... (reply):</i><br>
 					Here is your panel.<br><br>
 				<p><u><b>Example 2:</b></u></p>

@@ -8,11 +8,10 @@ import net.b07z.sepia.server.teach.database.Elasticsearch;
 import net.b07z.sepia.server.teach.database.ElasticsearchTest;
 import net.b07z.sepia.server.teach.tools.ElasticSearchImporter;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.core.Is.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
-
-import static org.hamcrest.CoreMatchers.is;
 
 @Ignore("Test need to be updated and are temporarily deactivated!") 		//TODO: update tests
 public class ElasticSearchImporterTest {

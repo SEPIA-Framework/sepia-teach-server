@@ -1,9 +1,10 @@
 package net.b07z.sepia.server.teach.server;
 
 import static org.junit.Assert.fail;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.hamcrest.core.Is.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 import java.net.URL;
@@ -90,7 +91,7 @@ public class StartTest {
 		
 		JSONObject node = (JSONObject) result.get(0);
 		String id = node.get("id").toString();
-		assertTrue(false == es.search(Config.DB_COMMANDS, Command.COMMANDS_TYPE, "*").toJSONString().contains("Good"));
+		assertFalse(es.search(Config.DB_COMMANDS, Command.COMMANDS_TYPE, "*").toJSONString().contains("Good"));
 
 		//vote for a test sentence with the same user
 		FakeRequest request2 = new FakeRequest("id=" + id, "vote=Good", "text=i am looking for a döner", "language=en");
@@ -270,15 +271,15 @@ public class StartTest {
 		String result = Start.getAnswersByType(new FakeRequest(user, "answerType=yes_no_ask_0a", "language=de", "user="+ConfigDefaults.defaultAssistantUserId), new FakeResponse());
 		assertTrue(result.contains("jetzt"));
 		String result2 = Start.getAnswersByType(new FakeRequest(user, "answerType=yes_no_ask_0a"), new FakeResponse());
-		assertTrue(false == result2.contains("jetzt"));
+		assertFalse(result2.contains("jetzt"));
 		String result2b = Start.getAnswersByType(new FakeRequest(user, "answerType=yes_no_ask", "user="+ConfigDefaults.defaultAssistantUserId), new FakeResponse());
-		assertTrue(false == result2b.contains("jetzt"));
+		assertFalse(result2b.contains("jetzt"));
 		String result3 = Start.getAnswersByType(new FakeRequest(user, "answerType=yes_no_ask_0a", "language=de", "user="+ConfigDefaults.defaultAssistantUserId), new FakeResponse());
 		assertTrue(result3.contains("jetzt"));
 		String result4 = Start.getAnswersByType(new FakeRequest(user, "answerType=yes_no_ask_0a", "language=de", "user=jim sample"), new FakeResponse());
-		assertTrue(false == result4.contains("jetzt"));
+		assertFalse(result4.contains("jetzt"));
 		String result5 = Start.getAnswersByType(new FakeRequest(user, "answerType=yes_no_ask_0a", "language=xx", "user="+ConfigDefaults.defaultAssistantUserId), new FakeResponse());
-		assertTrue(false == result5.contains("jetzt"));
+		assertFalse(result5.contains("jetzt"));
 	}
 
 	@Test
@@ -305,7 +306,7 @@ public class StartTest {
 		assertTrue(resultOfQuery.contains(user.getUserID()));
 		assertTrue(resultOfQuery.contains("xyz_answer"));
 		assertTrue(resultOfQuery.contains("polite"));
-		assertTrue(false == resultOfQuery.contains("neutral"));
+		assertFalse(resultOfQuery.contains("neutral"));
 		//query for system answer
 		String resultOfQuery2 = Start.getAnswersByType(new FakeRequest(user, "answerType=xyz_answer_2", "user="+ConfigDefaults.defaultAssistantUserId), new FakeResponse());
 		assertTrue(resultOfQuery2.contains("\"" + ConfigDefaults.defaultAssistantUserId + "\""));
