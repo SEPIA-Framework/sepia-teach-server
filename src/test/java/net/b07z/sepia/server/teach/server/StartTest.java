@@ -1,10 +1,10 @@
 package net.b07z.sepia.server.teach.server;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.fail;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.hamcrest.core.Is.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 import java.net.URL;
