@@ -609,7 +609,7 @@ public final class Start {
 		String language = getOrDefault("language", userLanguage, params);
 		String from = getOrDefault("from", "0", params);
 		String size = getOrDefault("size", "10", params);
-		String with_button_only = getOrDefault("button", null, params);
+		String withButtonOnly = getOrDefault("button", null, params);
 		boolean sortByDateNewest = getOrDefault("sortByDate", false, params);
 		
 		HashMap<String, Object> filters = new HashMap<>();
@@ -617,7 +617,7 @@ public final class Start {
 		filters.put("language", language);
 		filters.put("from", from);
 		filters.put("size", size);
-		if (with_button_only != null){
+		if (withButtonOnly != null){
 			filters.put("button", true); 	//Its either true or not included
 		}
 		filters.put("sortByDate", sortByDateNewest);
