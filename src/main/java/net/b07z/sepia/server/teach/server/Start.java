@@ -427,7 +427,7 @@ public final class Start {
 		Account account = authenticate(params, request, response);
 		
 		//get required parameters:
-		Language language = getLanguage(params);
+		Language language = getLanguageOrFail(params);
 		String environment = getOrDefault("environment", "all", params);
 		String deviceId = params.getString("device_id");
 		String sentence = getOrFail("sentence", params);
@@ -533,8 +533,8 @@ public final class Start {
 		//statistics a
 		long tic = System.currentTimeMillis();
 		
-		Language language = getLanguage(params);
-		boolean includePublic = getOrDefault("include_public", true, params); 		//default is with public now
+		Language language = getLanguageOrFail(params);
+		boolean includePublic = getOrDefault("include_public", true, params); 	//default is with public now
 		String searchText = getOrDefault("searchText", "", params);				//in case we only want certain results matching the search text
 		HashMap<String, Object> filters = new HashMap<>();
 		//String userOrSelf = getOrDefault("user", userAccount.getUserID(), request); 
@@ -610,6 +610,8 @@ public final class Start {
 		String from = getOrDefault("from", "0", params);
 		String size = getOrDefault("size", "10", params);
 		String with_button_only = getOrDefault("button", null, params);
+		boolean sortByDateNewest = getOrDefault("sortByDate", false, params);
+		
 		HashMap<String, Object> filters = new HashMap<>();
 		filters.put("userId", userId);
 		filters.put("language", language);
@@ -618,6 +620,8 @@ public final class Start {
 		if (with_button_only != null){
 			filters.put("button", true); 	//Its either true or not included
 		}
+		filters.put("sortByDate", sortByDateNewest);
+		
 		TeachDatabase db = getDatabase();
 		JSONArray output = db.getAllPersonalCommands(filters);
 		return output;
@@ -692,7 +696,7 @@ public final class Start {
 		authenticate(params, request, response);
 		requireRole(request, Role.superuser);
 		
-		Language language = getLanguage(params);
+		Language language = getLanguageOrFail(params);
 		JSONArray sentencesForTraining = getDatabase().getAllCustomSentencesAsTrainingData(language.toValue());
 		
 		return SparkJavaFw.returnResult(request, response, JSON.make(
@@ -710,7 +714,7 @@ public final class Start {
 		requireTranslatorRole(request);
 		
 		String id = getOrFail("id", params);
-		Language language = getLanguage(params);
+		Language language = getLanguageOrFail(params);
 		String text = getOrFail("text", params);
 		getDatabase().addSentence(id, language, text, userAccount);
 		logDB(request, "added sentence", language, null, text, getDatabase());
@@ -724,7 +728,7 @@ public final class Start {
 		Account userAccount = authenticate(params, request, response);
 		
 		String docId = getOrFail("id", params);
-		Language votedLanguage = getLanguage(params);
+		Language votedLanguage = getLanguageOrFail(params);
 		String votedSentence = getOrFail("text", params);
 		TeachDatabase db = getDatabase();
 		Vote vote = Vote.valueOf(getOrFail("vote", params));
@@ -764,7 +768,7 @@ public final class Start {
 		Account userAccount = authenticate(params, request, response);
 		requireDeveloperRole(request);
 		
-		Language language = getLanguage(params);
+		Language language = getLanguageOrFail(params);
 		String type = getOrFail("type", params);
 		String text = getOrFail("text", params);
 		List<Answer.Character> characters = new ArrayList<>();
@@ -868,7 +872,7 @@ public final class Start {
 		requireTranslatorRole(request);
 		
 		String id = getOrFail("id", params);
-		Language language = getLanguage(params);
+		Language language = getLanguageOrFail(params);
 		String oldText = getOrFail("oldText", params);
 		String newText = getOrFail("newText", params);
 		getDatabase().modifyAnswer(id, language, oldText, newText);
@@ -883,7 +887,7 @@ public final class Start {
 		Account userAccount = authenticate(params, request, response);
 		String docId = getOrFail("id", params);
 		// id would be enough, but just to be sure (and to be similar to voteSentence), we also check text and language:
-		Language votedLanguage = getLanguage(params);
+		Language votedLanguage = getLanguageOrFail(params);
 		String votedSentence = getOrFail("text", params);
 		TeachDatabase db = getDatabase();
 		Vote vote = Vote.valueOf(getOrFail("vote", params));
@@ -1143,12 +1147,9 @@ public final class Start {
 			throw new RuntimeException("Parameter '" + paramName + "' is empty or whitespace only");
 		}
 	}
-	private static Language getLanguage(String paramName, RequestParameters params) {
-		String code = getOrFail(paramName, params);
+	private static Language getLanguageOrFail(RequestParameters params) {
+		String code = getOrFail("language", params);
 		return Language.forValue(code);
-	}
-	private static Language getLanguage(RequestParameters params) {
-		return getLanguage("language", params);
 	}
 	
 	private static void requireTranslatorRole(Request request) {
