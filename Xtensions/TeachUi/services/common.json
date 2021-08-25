@@ -156,6 +156,79 @@
 				"optional" : true
 			}]
 		},
+		"music" : {
+			"command" : "music",
+			"name" : "Search/play specific music",
+			"desc" : "Use this command to search music by song, artist, title etc. or play specific content of a supported service.",
+			"help" : "<p><u><b>Example:</b></u></p>
+					<i>When I say ...</i>
+					<br>Play music by Queen<br><br>
+					<i>the assistant does ...</i><br>
+					Search/play specific music<br><br>
+					<i>Music service:</i><br>
+					YouTube<br><br>
+					<i>Playlist name:</i><br>
+					Queen Greatest Hits<br><br>"
+				,
+			"parameters" : [{
+				"value" : "music_service",
+				"name" : "Music service",
+				"examples": {
+					"1": ["&lt;embedded&gt;", "&lt;youtube&gt;", "&lt;youtube_embedded&gt;", "&lt;vlc_media_player&gt;", "&lt;spotify_link&gt;", "&lt;apple_music_link&gt;"],
+					"2": [{"input": "YouTube embedded", "value": "youtube_embedded", "value_local": "YouTube Widget"}],
+					"3": ["YouTube", "Spotify Link", "VLC"]
+				}
+			},{
+				"value" : "artist",
+				"name" : "Music artist",
+				"examples": {
+					"1": ["Queen", "Metallica", "Jimi Hendrix"],
+					"2": [{"value": "Jimi Hendrix"}],
+					"3": ["by Queen", "from Metallica", "by Jimi Hendrix"]
+				}
+			},{
+				"value" : "song",
+				"name" : "Song/Title",
+				"examples": {
+					"1": ["Bohemian Rhapsody", "Master Of Puppets", "Castles made of Sand"],
+					"2": [{"value": "Castles made of Sand"}],
+					"3": ["Song named Castles made of Sand"]
+				},
+				"optional" : true
+			},{
+				"value" : "music_album",
+				"name" : "Album",
+				"examples": {
+					"1": ["A Kind of Magic"],
+					"2": [{"value": "A Kind of Magic"}],
+					"3": ["from the album A Kind of Magic"]
+				},
+				"optional" : true
+			},{
+				"value" : "playlist_name",
+				"name" : "Playlist name",
+				"examples": {
+					"1": ["Queen Greatest Hits"],
+					"2": [{"value": "Queen Greatest Hits"}],
+					"3": ["Queen Greatest Hits playlist"]
+				},
+				"optional" : true
+			},{
+				"alias" : "genre",
+				"name" : "Music genre",
+				"optional" : true
+			},{
+				"value" : "data",
+				"name" : "Service data (JSON or direct URL)",
+				"type" : "generic",
+				"examples": {
+					"1": ["https://www.youtube.com/embed/peENJe_ORdI"],
+					"2": [{"value": {"uri": "https://www.youtube.com/embed/peENJe_ORdI", "service": "youtube"}}],
+					"3": ["NOT-SUPPORTED"]
+				},
+				"optional" : true
+			}]
+		},
 		"sentence_connect" : {
 			"command" : "sentence_connect",
 			"name" : "Execute command(s)",
