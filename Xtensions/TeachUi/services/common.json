@@ -154,6 +154,10 @@
 				"alias" : "action",
 				"name" : "Action (start, stop)",
 				"optional" : true
+			},{
+				"alias" : "reply",
+				"name" : "Custom answer for stream start",
+				"optional" : true
 			}]
 		},
 		"music" : {
@@ -226,6 +230,10 @@
 					"2": [{"value": {"uri": "https://www.youtube.com/embed/peENJe_ORdI", "service": "youtube"}}],
 					"3": ["NOT-SUPPORTED"]
 				},
+				"optional" : true
+			},{
+				"alias" : "reply",
+				"name" : "Custom success answer(s)",
 				"optional" : true
 			}]
 		},
