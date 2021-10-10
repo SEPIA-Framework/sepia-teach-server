@@ -500,11 +500,11 @@
 					<i>the assistant does ...</i><br>
 					Control custom frame<br><br>
 					<i>Path to frame file (URL):</i><br>
-					&lt;assist_server&gt;/views/custom-view-demo.html<br><br>
+					&lt;assist_server&gt;/views/demo-view.html<br><br>
 					<i>Action (action):</i><br>
 					&lt;on&gt;<br><br>
 					<i>Frame data (JSON string):</i><br>
-					{\"onOpen\": \"sayHelloOnOpen\", \"onSpeechToTextInputHandler\": \"handleSttData\", \"onChatOutputHandler\": \"handleChatOutput\"}<br><br>
+					{\"onOpen\": \"myOtherOnOpenFunction\"}<br><br>
 					<i>and says ... (reply):</i><br>
 					Here is your panel.<br><br>
 				<p><u><b>Example 2:</b></u></p>
@@ -525,14 +525,14 @@
 				"alias" : "url",
 				"name" : "Path to frame file (URL)",
 				"examples": {
-					"0": ["&lt;assist_server&gt;/views/custom-view-demo.html", "&lt;custom_data&gt;/demo-view.html"]
+					"0": ["&lt;assist_server&gt;/views/clock.html", "&lt;custom_data&gt;/demo-view.html"]
 				}
 			},{
 				"alias" : "data",
 				"name" : "Frame data (JSON string)",
 				"examples": {
 					"1": ["NOT-SUPPORTED"],
-					"2": [{"functionName": "test", "data": "my_data"}, {"onOpen": "sayHelloOnOpen", "onSpeechToTextInputHandler": "handleSttData", "onChatOutputHandler": "handleChatOutput"}],
+					"2": [{"functionName": "test", "data": "my_data"}, {"onOpen": "myOtherOnOpenFunction"}],
 					"3": ["NOT-SUPPORTED"]
 				}
 			},{
