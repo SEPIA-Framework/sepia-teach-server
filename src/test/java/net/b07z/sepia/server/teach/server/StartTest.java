@@ -8,6 +8,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+
+import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -15,9 +18,6 @@ import org.json.simple.parser.ParseException;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
 
 import net.b07z.sepia.server.core.data.Answer;
 import net.b07z.sepia.server.core.data.Command;
@@ -324,14 +324,14 @@ public class StartTest {
 
 	private void setupCommandsData(Elasticsearch es, String jsonFile) throws IOException {
 		URL url = StartTest.class.getResource(jsonFile);
-		String json = Resources.toString(url, Charsets.UTF_8);
+		String json = IOUtils.resourceToString(url.toString(), StandardCharsets.UTF_8);
 		es.writeDocument(Config.DB_COMMANDS, Command.COMMANDS_TYPE, json);
 		es.refresh();
 	}
 
 	private void setupAnswerData(Elasticsearch es, String jsonFile) throws IOException {
 		URL url = StartTest.class.getResource(jsonFile);
-		String json = Resources.toString(url, Charsets.UTF_8);
+		String json = IOUtils.resourceToString(url.toString(), StandardCharsets.UTF_8);
 		es.writeDocument(Config.DB_ANSWERS, Answer.ANSWERS_TYPE, json);
 		es.refresh();
 	}

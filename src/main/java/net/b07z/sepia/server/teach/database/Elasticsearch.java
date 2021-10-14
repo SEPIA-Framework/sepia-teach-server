@@ -447,8 +447,23 @@ public class Elasticsearch implements TeachDatabase {
 			nestedMatches.add(new QueryElement(nestPath + ".data.show_button", true));
 		}
 		JSONObject queryJson = EsQueryBuilder.getNestedBoolMustMatch(nestPath, nestedMatches);
+		//paging
 		JSON.put(queryJson, "from", from);
 		JSON.put(queryJson, "size", size);
+		//sorting
+		boolean sortByDate = (filters.containsKey("sortByDate"))? (boolean) filters.get("sortByDate") : false;
+		if (sortByDate){
+			//TODO: "text" sorting requires re-indexing and consumes more memory! :-/
+			//Docs: https://www.elastic.co/guide/en/elasticsearch/reference/5.3/search-request-sort.html
+			String sortKey = "sentences.date"; 	//"sentences.text";
+			JSONObject sortObj = JSON.make(
+				"order", "desc", 				//"order", "asc",
+				"mode", "max", 					//"mode", "min"
+				"nested_path", "sentences"		//TODO: This has been replaced by "nested" in newer ES!
+			);
+			JSONArray sortArray = JSON.makeArray(JSON.make(sortKey, sortObj));
+			JSON.put(queryJson, "sort", sortArray);
+		}
 		
 		//collect results
 		JSONObject result = searchByJson(ES_COMMANDS_PATH, queryJson.toJSONString());
