@@ -469,7 +469,7 @@
 				}
 			},{
 				"value": "android_fun",
-				"name": "Android specific Intent or URL (androidActivity)",
+				"name": "Android Intent (androidActivity, androidBroadcast)",
 				"type": "generic",
 				"examples": {
 					"1": ["NOT-SUPPORTED"],
