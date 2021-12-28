@@ -504,9 +504,9 @@
 					<i>Action (action):</i><br>
 					&lt;on&gt;<br><br>
 					<i>Frame data (JSON string):</i><br>
-					{\"onOpen\": \"myOtherOnOpenFunction\"}<br><br>
+					{\"data\": {\"my-info\": \"cool\"}}<br><br>
 					<i>and says ... (reply):</i><br>
-					Here is your panel.<br><br>
+					Here is your view.<br><br>
 				<p><u><b>Example 2:</b></u></p>
 					<i>When I say ...</i>
 					<br>_demo_frame_ Select TEST<br><br>
@@ -532,7 +532,7 @@
 				"name" : "Frame data (JSON string)",
 				"examples": {
 					"1": ["NOT-SUPPORTED"],
-					"2": [{"functionName": "test", "data": "my_data"}, {"onOpen": "myOtherOnOpenFunction"}],
+					"2": [{"functionName": "test", "data": "my_data"}, {"data": {"custom": "on-open info etc."}}],
 					"3": ["NOT-SUPPORTED"]
 				}
 			},{
