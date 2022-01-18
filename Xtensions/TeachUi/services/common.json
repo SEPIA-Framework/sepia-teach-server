@@ -1,24 +1,24 @@
 {
 	"parameter_commons": {
 		"reply": {
-			"value" : "reply",
-			"name" : "and says ...",
-			"type" : "text",
+			"value": "reply",
+			"name": "and says ...",
+			"type": "text",
 			"examples": {
 				"0": ["You can use &lt;1&gt;, &lt;2&gt;, ... to reference parameters that usually appear in answers for this service. References to the database are possible as well, e.g. &lt;summary_0a&gt;."]
 			}
 		},
 		"url": {
-			"value" : "url",
-			"name" : "with URL ...",
-			"type" : "text",
+			"value": "url",
+			"name": "with URL ...",
+			"type": "text",
 			"examples": {
 				"0": ["https://sepia-framework.github.io", "https://example.com/some-api", "https://example.com/some-music-file"]
 			}
 		},
 		"action": {
-			"value" : "action",
-			"name" : "Action (on, off, set ...): ",
+			"value": "action",
+			"name": "Action (on, off, set ...): ",
 			"examples": {
 				"1": ["&lt;on&gt;", "&lt;off&gt;", "&lt;set&gt;", "&lt;show&gt;"],
 				"2": [{"value": "on", "value_local": "einschalten"}],
@@ -26,8 +26,8 @@
 			}
 		},
 		"number": {
-			"value" : "number",
-			"name" : "Number (11, 50%, 5$, ...): ",
+			"value": "number",
+			"name": "Number (11, 50%, 5$, ...): ",
 			"examples": {
 				"1": ["11", "50%", "5$"],
 				"2": [{"input": "5$", "type": "currency", "value": "5"}, {"input": "2 persons", "type": "persons", "value": "2"}],
@@ -35,18 +35,18 @@
 			}
 		},
 		"genre": {
-			"value" : "genre",
-			"name" : "Music genre",
+			"value": "genre",
+			"name": "Music genre",
 			"examples": {
 				"1": ["my", "rock", "metal", "hip-hop", "classic", "alternative", "indie", "chill", "blues", "jazz"],
 				"2": [{"value": "classic", "found": "klassik", "value_local": "Klassik"}],
 				"3": ["my", "rock", "metal", "hip-hop", "classic", "alternative", "indie", "chill", "blues", "jazz"]
 			}
 		},
-		"media_controls" : {
-			"value" : "media_controls",
-			"name" : "Media control (play, pause, next, ...)",
-			"optional" : true,
+		"media_controls": {
+			"value": "media_controls",
+			"name": "Media control (play, pause, next, ...)",
+			"optional": true,
 			"examples": {
 				"1": ["&lt;play&gt;", "&lt;pause&gt;", "&lt;resume&gt;", "&lt;volume_up&gt;", "&lt;next&gt;"],
 				"2": [{"value_local": "stoppen", "value": "stop"}],
@@ -54,9 +54,9 @@
 			}
 		},
 		"data": {
-			"value" : "data",
-			"name" : "Generic data (JSON or value)",
-			"type" : "generic",
+			"value": "data",
+			"name": "Generic data (JSON or value)",
+			"type": "generic",
 			"examples": {
 				"1": ["my data", "42"],
 				"2": [{"value":42}, {"value":"my data", "isGeneric":true}, {"value":{"text":"Hello", "type":"World"}}],
@@ -65,11 +65,11 @@
 		}
 	},
 	"commands": {
-		"chat" : {
-			"command" : "chat",
-			"name" : "Chat/smalltalk",
-			"desc" : "Use this command to define a simple reply to any input.",
-			"help" : "<p><u><b>Example:</b></u></p>
+		"chat": {
+			"command": "chat",
+			"name": "Chat/smalltalk",
+			"desc": "Use this command to define a simple reply to any input.",
+			"help": "<p><u><b>Example:</b></u></p>
 					<i>When I say ...</i>
 					<br>What did the Buddhist say to the hot dog vendor?<br><br>
 					<i>the assistant does ...</i><br>
@@ -77,15 +77,15 @@
 					<i>and says ... (reply):</i><br>
 					Make me one with everything.<br><br>"
 				,
-			"parameters" : [{
-				"alias" : "reply"
+			"parameters": [{
+				"alias": "reply"
 			}]
 		},
-		"open_link" : {
-			"command" : "open_link",
-			"name" : "Open link/website",
-			"desc" : "Use this command to open a website or any URL.",
-			"help" : "<p><u><b>Example:</b></u></p>
+		"open_link": {
+			"command": "open_link",
+			"name": "Open link/website",
+			"desc": "Use this command to open a website or any URL.",
+			"help": "<p><u><b>Example:</b></u></p>
 					<i>When I say ...</i>
 					<br>Open the SEPIA homepage<br><br>
 					<i>the assistant does ...</i><br>
@@ -95,26 +95,26 @@
 					<i>and says ... (answer_set):</i><br>
 					Here is my homepage.<br><br>"
 				,
-			"parameters" : [{
-				"alias" : "url"
+			"parameters": [{
+				"alias": "url"
 			},{
-				"alias" : "reply",
-				"value" : "answer_set"
+				"alias": "reply",
+				"value": "answer_set"
 			},{
-				"value" : "title",
-				"name" : "Card title",
-				"optional" : true,
-				"type" : "text"
+				"value": "title",
+				"name": "Card title",
+				"optional": true,
+				"type": "text"
 			},{
-				"value" : "description",
-				"name" : "Card description",
-				"optional" : true,
-				"type" : "text"
+				"value": "description",
+				"name": "Card description",
+				"optional": true,
+				"type": "text"
 			},{
-				"value" : "icon_url",
-				"name" : "Link to card icon (URL)",
-				"optional" : true,
-				"type" : "text",
+				"value": "icon_url",
+				"name": "Link to card icon (URL)",
+				"optional": true,
+				"type": "text",
 				"examples": {
 					"0": [
 						"Use an URL relative to the client, to your local server or any public resource, e.g.:<p>img/icon.png</p><p>http://[sepia-server-ip]:20726/assist/files/images/cards/link.png</p><p>https://sepia-framework.github.io/img/logo.png</p>"
@@ -122,11 +122,11 @@
 				}
 			}]
 		},
-		"music_radio" : {
-			"command" : "music_radio",
-			"name" : "Open music stream",
-			"desc" : "Use this command to start/stop a radio station, play a radio with a certain genre or start an audio stream (URL).",
-			"help" : "<p><u><b>Example:</b></u></p>
+		"music_radio": {
+			"command": "music_radio",
+			"name": "Open music stream",
+			"desc": "Use this command to start/stop a radio station, play a radio with a certain genre or start an audio stream (URL).",
+			"help": "<p><u><b>Example:</b></u></p>
 					<i>When I say ...</i>
 					<br>Play my station<br><br>
 					<i>the assistant does ...</i><br>
@@ -134,37 +134,37 @@
 					<i>Radio station ... (radio_station):</i><br>
 					EgoFM Pure<br><br>"
 				,
-			"parameters" : [{
-				"value" : "radio_station",
-				"name" : "Radio station ...",
+			"parameters": [{
+				"value": "radio_station",
+				"name": "Radio station ...",
 				"examples": {
 					"1": ["size", "ego_fm_pure", "deluxe_lounge", "1live_diggi", "wdr2"],
 					"2": [{"input": "EgoFM Pure", "value": "ego_fm_pure", "cache_entry": "ego_fm_pure"}],
 					"3": ["Size Radio", "egoFM Pure", "WDR 2"]
 				}
 			},{
-				"alias" : "genre",
-				"name" : "or genre ...",
-				"optional" : true
+				"alias": "genre",
+				"name": "or genre ...",
+				"optional": true
 			},{
-				"alias" : "url",
-				"name" : "or stream URL (requires station)",
-				"optional" : true
+				"alias": "url",
+				"name": "or stream URL (requires station)",
+				"optional": true
 			},{
-				"alias" : "action",
-				"name" : "Action (start, stop)",
-				"optional" : true
+				"alias": "action",
+				"name": "Action (start, stop)",
+				"optional": true
 			},{
-				"alias" : "reply",
-				"name" : "Custom answer for stream start",
-				"optional" : true
+				"alias": "reply",
+				"name": "Custom answer for stream start",
+				"optional": true
 			}]
 		},
-		"music" : {
-			"command" : "music",
-			"name" : "Search/play specific music",
-			"desc" : "Use this command to search music by song, artist, title etc. or play specific content of a supported service.",
-			"help" : "<p><u><b>Example:</b></u></p>
+		"music": {
+			"command": "music",
+			"name": "Search/play specific music",
+			"desc": "Use this command to search music by song, artist, title etc. or play specific content of a supported service.",
+			"help": "<p><u><b>Example:</b></u></p>
 					<i>When I say ...</i>
 					<br>Play music by Queen<br><br>
 					<i>the assistant does ...</i><br>
@@ -174,77 +174,77 @@
 					<i>Playlist name:</i><br>
 					Queen Greatest Hits<br><br>"
 				,
-			"parameters" : [{
-				"value" : "music_service",
-				"name" : "Music service",
+			"parameters": [{
+				"value": "music_service",
+				"name": "Music service",
 				"examples": {
 					"1": ["&lt;embedded&gt;", "&lt;youtube&gt;", "&lt;youtube_embedded&gt;", "&lt;vlc_media_player&gt;", "&lt;spotify_link&gt;", "&lt;apple_music_link&gt;"],
 					"2": [{"input": "YouTube embedded", "value": "youtube_embedded", "value_local": "YouTube Widget"}],
 					"3": ["YouTube", "Spotify Link", "VLC"]
 				}
 			},{
-				"value" : "artist",
-				"name" : "Music artist",
+				"value": "artist",
+				"name": "Music artist",
 				"examples": {
 					"1": ["Queen", "Metallica", "Jimi Hendrix"],
 					"2": [{"value": "Jimi Hendrix"}],
 					"3": ["by Queen", "from Metallica", "by Jimi Hendrix"]
 				}
 			},{
-				"value" : "song",
-				"name" : "Song/Title",
+				"value": "song",
+				"name": "Song/Title",
 				"examples": {
 					"1": ["Bohemian Rhapsody", "Master Of Puppets", "Castles made of Sand"],
 					"2": [{"value": "Castles made of Sand"}],
 					"3": ["Song named Castles made of Sand"]
 				},
-				"optional" : true
+				"optional": true
 			},{
-				"value" : "music_album",
-				"name" : "Album",
+				"value": "music_album",
+				"name": "Album",
 				"examples": {
 					"1": ["A Kind of Magic"],
 					"2": [{"value": "A Kind of Magic"}],
 					"3": ["from the album A Kind of Magic"]
 				},
-				"optional" : true
+				"optional": true
 			},{
-				"value" : "playlist_name",
-				"name" : "Playlist name",
+				"value": "playlist_name",
+				"name": "Playlist name",
 				"examples": {
 					"1": ["Queen Greatest Hits"],
 					"2": [{"value": "Queen Greatest Hits"}],
 					"3": ["Queen Greatest Hits playlist"]
 				},
-				"optional" : true
+				"optional": true
 			},{
-				"alias" : "genre",
-				"name" : "Music genre",
-				"optional" : true
+				"alias": "genre",
+				"name": "Music genre",
+				"optional": true
 			},{
-				"value" : "data",
-				"name" : "Service data (JSON or direct URL)",
-				"type" : "generic",
+				"value": "data",
+				"name": "Service data (JSON or direct URL)",
+				"type": "generic",
 				"examples": {
 					"1": ["https://www.youtube.com/embed/peENJe_ORdI"],
 					"2": [{"value": {"uri": "https://www.youtube.com/embed/peENJe_ORdI", "service": "youtube"}}],
 					"3": ["NOT-SUPPORTED"]
 				},
-				"optional" : true
+				"optional": true
 			},{
-				"alias" : "reply",
-				"name" : "Custom success answer(s)",
-				"optional" : true
+				"alias": "reply",
+				"name": "Custom success answer(s)",
+				"optional": true
 			}]
 		},
-		"sentence_connect" : {
-			"command" : "sentence_connect",
-			"name" : "Execute command(s)",
-			"desc" : "Use this command to define an alias for one or more other commands. If you define more than one sentence (seperated by '.') they will be called one after the other (if the client supports it!). 
+		"sentence_connect": {
+			"command": "sentence_connect",
+			"name": "Execute command(s)",
+			"desc": "Use this command to define an alias for one or more other commands. If you define more than one sentence (seperated by '.') they will be called one after the other (if the client supports it!). 
 					This command supports 5 special flexible input parameters: &lt;var1&gt; ... &lt;var5&gt;, see example 2. 
 					Each 'var' represents exactly one word, consecutive 'var' are combined to one parameter (e.g. you need '&lt;var1&gt; &lt;var1&gt; &lt;var1&gt;' to match 'Statue of Liberty'), see example 3. 
 					Note: you cannot use sentences that you've previously defined yourself.",
-			"help" : "<p><u><b>Example 1:</b></u></p>
+			"help": "<p><u><b>Example 1:</b></u></p>
 					<i>When I say ...</i>
 					<br>Morning briefing<br><br>
 					<i>the assistant does ...</i><br>
@@ -272,9 +272,9 @@
 					<i>and says ... (reply):</i><br>
 					Searching information.<br><br>"
 				,
-			"parameters" : [{
-				"value" : "sentences",
-				"name" : "using these sentences ...",
+			"parameters": [{
+				"value": "sentences",
+				"name": "using these sentences ...",
 				"examples": {
 					"all": ["Info: This command supports 5 special flexible input parameters: &lt;var1&gt; ... &lt;var5&gt;. See command info for a full explanation."],
 					"1": ["Good morning && Weather in Berlin && Tech news"],
@@ -282,16 +282,16 @@
 					"3": ["Good morning. Show me the weather in Berlin. Show me tech news."]
 				}
 			},{
-				"alias" : "reply",
-				"optional" : true
+				"alias": "reply",
+				"optional": true
 			}]
 		},
-		"smartdevice" : {
-			"command" : "smartdevice",
-			"name" : "Control smart home device",
-			"desc" : "Use this command to create specific actions for smart (home) devices. Usually the parameters expect certain, predefined types (see example 1) but 
+		"smartdevice": {
+			"command": "smartdevice",
+			"name": "Control smart home device",
+			"desc": "Use this command to create specific actions for smart (home) devices. Usually the parameters expect certain, predefined types (see example 1) but 
 					you can use the 'i_raw' modifier to use natural language or even create new types on-the-fly using JSON (see example 2).",
-			"help" : "<p><u><b>Example 1:</b></u></p>
+			"help": "<p><u><b>Example 1:</b></u></p>
 					<i>When I say ...</i>
 					<br>Let there be light<br><br>
 					<i>the assistant does ...</i><br>
@@ -327,48 +327,48 @@
 					<i>Custom answer(s):</i><br>
 					Mom is &lt;3&gt;.<br><br>"
 				,
-			"parameters" : [{
-				"value" : "smart_device",
-				"name" : "Smart device (Light, Heater, ...)",
+			"parameters": [{
+				"value": "smart_device",
+				"name": "Smart device (Light, Heater, ...)",
 				"examples": {
 					"1": ["&lt;light&gt;;;1", "&lt;heater&gt;;;Floor 2", "&lt;sensor&gt;;;A38", "&lt;device&gt;;;Robo"],
 					"2": [{"value_local": "das Licht", "device_tag": "Deckenleuchte", "value": "light"}],
 					"3": ["Light 2", "Deckenleuchte", "Roller shutter"]
 				}
 			},{
-				"value" : "room",
-				"name" : "Room (living room, kitchen, ...)",
-				"optional" : true,
+				"value": "room",
+				"name": "Room (living room, kitchen, ...)",
+				"optional": true,
 				"examples": {
 					"1": ["&lt;livingroom&gt;;;1", "&lt;bath&gt;;;Bad", "&lt;bedroom&gt;;;OG2", "&lt;kitchen&gt;"],
 					"2": [{"value_local": "im Badezimmer", "room_tag": "bad", "value": "bath"}],
 					"3": ["living room", "bath", "Wohnzimmer", "Bad"]
 				}
 			},{
-				"alias" : "action",
-				"optional" : true
+				"alias": "action",
+				"optional": true
 			},{
-				"value" : "smart_device_value",
-				"name" : "Value (50%, 20°C, ...): ",
-				"optional" : true,
+				"value": "smart_device_value",
+				"name": "Number Value (50%, 20°C, ...): ",
+				"optional": true,
 				"examples": {
 					"1": ["&lt;percent&gt;;;50", "&lt;plain&gt;;;11", "&lt;temperature&gt;;;17°c"],
 					"2": [{"type": "number_temperature_c", "value": "17"}, {"type": "number_percent", "value": "50"}],
 					"3": ["50%", "20°C", "70°F"]
 				}
 			},{
-				"alias" : "reply",
-				"name" : "Custom answer(s)",
-				"optional" : true
+				"alias": "reply",
+				"name": "Custom answer(s)",
+				"optional": true
 			}]
 		},
-		"client_controls" : {
-			"command" : "client_controls",
-			"name" : "Execute a client control function",
-			"desc" : "Use this command to call a client control function like 'set sound volume' or 'open settings'. 
+		"client_controls": {
+			"command": "client_controls",
+			"name": "Execute a client control function",
+			"desc": "Use this command to call a client control function like 'set sound volume' or 'open settings'. 
 					You can also call external tools like <a href='https://www.npmjs.com/package/clexi' target='_blank'>CLEXI</a> (clexi) or 
 					a <a href='https://github.com/SEPIA-Framework/sepia-mesh-nodes' target='_blank'>SEPIA Mesh-Node</a> (meshNode) with specific data directly from this client.",
-			"help" : "<p><u><b>Example 1:</b></u></p>
+			"help": "<p><u><b>Example 1:</b></u></p>
 					<i>When I say ...</i>
 					<br>Rock!<br><br>
 					<i>the assistant does ...</i><br>
@@ -411,37 +411,37 @@
 					<i>Additional data (data):</i><br>
 					{ \"value\": { \"xtension\": \"clexi-broadcaster\", \"data\": { \"text\": \"Hello\", \"sender\": \"Me\" } } }<br><br>"
 				,
-			"parameters" : [{
-				"alias" : "action"
+			"parameters": [{
+				"alias": "action"
 			},{
-				"value" : "client_fun",
-				"name" : "Function (volume, view, runtime, ...)",
+				"value": "client_fun",
+				"name": "Function (volume, view, runtime, ...)",
 				"examples": {
 					"1": ["&lt;settings&gt;", "&lt;volume&gt;", "&lt;alwaysOn&gt;", "&lt;media&gt;", "&lt;clexi&gt;", "&lt;runtimeCommands&gt;"],
 					"2": [{"value_local": "the media player", "value": "media"}],
 					"3": ["media player", "settings", "volume", "always-on mode"]
 				}
 			},{
-				"alias" : "media_controls",
-				"optional" : true
+				"alias": "media_controls",
+				"optional": true
 			},{
-				"alias" : "data",
-				"optional" : true
+				"alias": "data",
+				"optional": true
 			},{
-				"alias" : "number",
-				"optional" : true
+				"alias": "number",
+				"optional": true
 			},{
-				"alias" : "reply",
-				"name" : "Custom answer (before calling function)",
-				"optional" : true
+				"alias": "reply",
+				"name": "Custom answer (before calling function)",
+				"optional": true
 			}]
 		},
-		"platform_controls" : {
-			"command" : "platform_controls",
-			"name" : "Execute platform specific actions",
-			"desc" : "Use this command to create a single sentence that triggers different client actions for each device ID or platform type (e.g. call Intent in Android (type=androidActivity) and URL in browser client (type=url)). 
+		"platform_controls": {
+			"command": "platform_controls",
+			"name": "Execute platform specific actions",
+			"desc": "Use this command to create a single sentence that triggers different client actions for each device ID or platform type (e.g. call Intent in Android (type=androidActivity) and URL in browser client (type=url)). 
 					Note: The device ID has highest priority, only if no device ID is given or no match is found the platform specific function will be called.",
-			"help" : "<p><u><b>Example 1:</b></u></p>
+			"help": "<p><u><b>Example 1:</b></u></p>
 					<i>When I say ...</i>
 					<br>Play Paradise City<br><br>
 					<i>the assistant does ...</i><br>
@@ -490,11 +490,11 @@
 				"type": "generic"
 			}]
 		},
-		"frame_control" : {
-			"command" : "frame_control",
-			"name" : "Control custom frame",
-			"desc" : "Use this command to control a custom frame (open/close/set data) if the client supports it. Custom frames are code pieces (usually mini HTML pages) that can be started/stopped, hook into the normal even cycle (input-response-action) and temporarily add additonal functionality to the client.",
-			"help" : "<p><u><b>Example:</b></u></p>
+		"frame_control": {
+			"command": "frame_control",
+			"name": "Control custom frame",
+			"desc": "Use this command to control a custom frame (open/close/set data) if the client supports it. Custom frames are code pieces (usually mini HTML pages) that can be started/stopped, hook into the normal even cycle (input-response-action) and temporarily add additonal functionality to the client.",
+			"help": "<p><u><b>Example:</b></u></p>
 					<i>When I say ...</i>
 					<br>Open my demo controls panel<br><br>
 					<i>the assistant does ...</i><br>
@@ -519,37 +519,37 @@
 					<i>and says ... (reply):</i><br>
 					Selecting TEST.<br><br>"
 				,
-			"parameters" : [{
-				"alias" : "action"
+			"parameters": [{
+				"alias": "action"
 			},{
-				"alias" : "url",
-				"name" : "Path to frame file (URL)",
+				"alias": "url",
+				"name": "Path to frame file (URL)",
 				"examples": {
 					"0": ["&lt;assist_server&gt;/views/clock.html", "&lt;custom_data&gt;/demo-view.html"]
 				}
 			},{
-				"alias" : "data",
-				"name" : "Frame data (JSON string)",
+				"alias": "data",
+				"name": "Frame data (JSON string)",
 				"examples": {
 					"1": ["NOT-SUPPORTED"],
 					"2": [{"functionName": "test", "data": "my_data"}, {"data": {"custom": "on-open info etc."}}],
 					"3": ["NOT-SUPPORTED"]
 				}
 			},{
-				"alias" : "reply",
-				"optional" : true
+				"alias": "reply",
+				"optional": true
 			}]
 		},
-		"mesh_node_plugin" : {
-			"command" : "mesh_node_plugin",
-			"name" : "Call SEPIA Mesh-Node plugin",
-			"desc" : "Use this command to call a <a href='https://github.com/SEPIA-Framework/sepia-mesh-nodes' target='_blank'>SEPIA Mesh-Node</a> plugin via the SEPIA server. 
+		"mesh_node_plugin": {
+			"command": "mesh_node_plugin",
+			"name": "Call SEPIA Mesh-Node plugin",
+			"desc": "Use this command to call a <a href='https://github.com/SEPIA-Framework/sepia-mesh-nodes' target='_blank'>SEPIA Mesh-Node</a> plugin via the SEPIA server. 
 					In contrast to the client-controls version this command is secured by your SEPIA account and evaluated by the server which enables some extra features. 
 					Note that the given URL referes to a path relative to the server as well and can be an IP inside your private home network where your SEPIA server is located. 
 					You can refer to results of the Mesh-Node plugin call inside your success or fail answers. To do this use the variable &lt;result_KEY&gt; where 'KEY' refers to a 
 					data field in your plugin result data, e.g. 'hello' in the 'HelloPlugin' example."
 					,
-			"help" : "<p><u><b>Example:</b></u></p>
+			"help": "<p><u><b>Example:</b></u></p>
 					<i>When I say ...</i>
 					<br>Test the hello plugin<br><br>
 					<i>the assistant does ...</i><br>
@@ -565,24 +565,24 @@
 					<i>Fail answer (reply_fail):</i><br>
 					Sorry I could not get a result<br><br>"
 				,
-			"parameters" : [{
-				"value" : "node_url",
-				"name" : "Mesh-Node URL",
-				"type" : "text",
+			"parameters": [{
+				"value": "node_url",
+				"name": "Mesh-Node URL",
+				"type": "text",
 				"examples": {
 					"0": ["http://localhost:20780"]
 				}
 			},{
-				"value" : "node_plugin_name",
-				"name" : "Name of plugin",
-				"type" : "text",
+				"value": "node_plugin_name",
+				"name": "Name of plugin",
+				"type": "text",
 				"examples": {
 					"0": ["HelloPlugin"]
 				}
 			},{
-				"value" : "node_plugin_data",
-				"name" : "JSON string sent to plugin",
-				"optional" : true,
+				"value": "node_plugin_data",
+				"name": "JSON string sent to plugin",
+				"optional": true,
 				"type": "generic",
 				"examples": {
 					"1": ["NOT-SUPPORTED"],
@@ -590,18 +590,18 @@
 					"3": ["NOT-SUPPORTED"]
 				}
 			},{
-				"value" : "reply_success",
-				"name" : "Success answer",
-				"optional" : true,
-				"type" : "text",
+				"value": "reply_success",
+				"name": "Success answer",
+				"optional": true,
+				"type": "text",
 				"examples": {
 					"0": ["Ok I understood &lt;result_hello&gt;"]
 				}
 			},{
-				"value" : "reply_fail",
-				"name" : "Fail answer",
-				"optional" : true,
-				"type" : "text"
+				"value": "reply_fail",
+				"name": "Fail answer",
+				"optional": true,
+				"type": "text"
 			}]
 		}
 	}
