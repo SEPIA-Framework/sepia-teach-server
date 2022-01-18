@@ -289,8 +289,9 @@
 		"smartdevice": {
 			"command": "smartdevice",
 			"name": "Control smart home device",
-			"desc": "Use this command to create specific actions for smart (home) devices. Usually the parameters expect certain, predefined types (see example 1) but 
-					you can use the 'i_raw' modifier to use natural language or even create new types on-the-fly using JSON (see example 2).",
+			"desc": "Use this command to create specific actions for smart (home) devices. Usually the input values are of specific predefined types (see example 1) but 
+					you can use the 'Text Value' parameter or JSON to set custom data as well (see examples 2 and 3). 
+					In custom answers you can use 'device' (1), 'room' (2) and 'state' (3) as variables (see example 3).",
 			"help": "<p><u><b>Example 1:</b></u></p>
 					<i>When I say ...</i>
 					<br>Let there be light<br><br>
@@ -302,7 +303,7 @@
 					&lt;bedroom&gt;<br><br>
 					<i>Action (action):</i><br>
 					&lt;set&gt;<br><br>
-					<i>Value (smart_device_value):</i><br>
+					<i>Number Value (smart_device_value):</i><br>
 					&lt;percent&gt;;;70<br><br>
 				<p><u><b>Example 2:</b></u></p>
 					<i>When I say ...</i>
@@ -313,8 +314,8 @@
 					&lt;i_raw&gt;RGB Lamp 1<br><br>
 					<i>Room (room):</i><br>
 					{\"value\":\"party_room\", \"value_local\":\"Party room\", \"index\":\"1\"}<br><br>
-					<i>Value (smart_device_value):</i><br>
-					{\"value\":\"[255,0,0]\", \"type\":\"color\"}<br><br>
+					<i>Text Value (general_value):</i><br>
+					red<br><br>
 				<p><u><b>Example 3:</b></u></p>
 					<i>When I say ...</i>
 					<br>Where is mom?<br><br>
@@ -355,6 +356,15 @@
 					"1": ["&lt;percent&gt;;;50", "&lt;plain&gt;;;11", "&lt;temperature&gt;;;17°c"],
 					"2": [{"type": "number_temperature_c", "value": "17"}, {"type": "number_percent", "value": "50"}],
 					"3": ["50%", "20°C", "70°F"]
+				}
+			},{
+				"value": "general_value",
+				"name": "Text Value (blue, clean, sleep, ...): ",
+				"optional": true,
+				"examples": {
+					"1": ["blue", "clean", "sleep"],
+					"2": [{"type": "text_raw", "value": "blue"}, {"value": "Netflix"}],
+					"3": ["NOT-SUPPORTED"]
 				}
 			},{
 				"alias": "reply",
