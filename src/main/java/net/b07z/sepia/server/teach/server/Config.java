@@ -20,7 +20,7 @@ public final class Config {
 	public static final String SERVERNAME = "SEPIA-Teach-API"; 		//public server name
 	public static String localName = "sepia-teach-server-1";		//**user defined local server name
 	public static String localSecret = "123456";					//**user defined secret to validate local server
-	public static final String apiVersion = "v2.2.3";				//API version
+	public static final String apiVersion = "v2.2.4";				//API version
 	public static String privacyPolicyLink = "";					//Link to privacy policy
 	
 	//helper for dynamic class creation
