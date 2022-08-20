@@ -71,6 +71,15 @@ public final class Start {
 	private Start() {}
 
 	public static void main(String[] args) {
+		
+		System.out.println("-----------------------------------------");
+		System.out.println("      ___    ___   ___   ___   ___       ");
+		System.out.println("     |___   |___  |___]   |   |___|      ");
+		System.out.println("     ____|. |___. |    . _|_. |   |.     ");
+		System.out.println("                                         ");
+		System.out.println("    https://sepia-framework.github.io    ");
+		System.out.println("                                         ");
+		
 		//load settings
 		serverType = TEST_SERVER;
 		for (String arg : args){
